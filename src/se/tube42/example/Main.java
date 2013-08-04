@@ -16,6 +16,10 @@ public class Main extends Frame
         TweenEquation.QUAD_OUT,
         TweenEquation.CUBE_IN,
         TweenEquation.CUBE_OUT,
+        TweenEquation.SIN_IN,
+        TweenEquation.SIN_OUT,        
+        TweenEquation.BACK_IN,
+        TweenEquation.BACK_OUT,
         TweenEquation.ELASTIC_IN,
         TweenEquation.ELASTIC_OUT
     };
@@ -23,24 +27,25 @@ public class Main extends Frame
     public Main()
     {
         
+        final WindowAdapter wc = new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        };
+                    
         // Frame stuff
-        setSize(800, 480);
         setVisible(true);
-        addWindowListener( new WindowAdapter() {
-                  public void windowClosing(WindowEvent e) {
-                  System.exit(0);
-              }                  
-              });
+        setSize(800, 520);        
+        addWindowListener(wc);
         
         
-        // create one item for each equation
-        final ExampleItem [] items = new ExampleItem[eqs.length];
+        // create two items
+        final ExampleItem [] items = new ExampleItem[ eqs.length];
         for(int i = 0; i < items.length; i++) {
-            items[i] = new ExampleItem();
-            items[i].setPosition(32, 32 + i * 40);
-            items[i].setSize(32, 32);            
-            items[i].setPositionDuration(2.0f);
-            items[i].setPositionEquation(eqs[i]);            
+            ExampleItem it = items[i] = new ExampleItem();
+            it.setPosition(132, 12 + i * 40);
+            it.setSize(32, 32);            
+            it.setPositionEquation(eqs[i]);
         }
         TweenManager.removeTweens(true); // commit all tweens
         
@@ -51,8 +56,9 @@ public class Main extends Frame
         // the worker thread will update the world time and request the canvas to draw the items
         new Thread() {
             public void run() {
-                try {                 
-                    boolean working = true, forward = false;                    
+                try {        
+                    Thread.sleep(1000);                                            
+                    boolean working = true, forward = false;
                     for(;;) {
                         Thread.sleep(1000);                        
                         long t_old = System.currentTimeMillis();
@@ -65,22 +71,38 @@ public class Main extends Frame
                         } while(working);
                         
                         // nothing to tween? move some stuff                        
+                        forward = !forward;                        
                         int x = forward ? 132 : c.getWidth() - 140 - 32;
-                        forward = !forward;
-                        for(int i = 0; i < items.length; i++)
-                            items[i].setPosition(x, 32 + i * 40);                
+                        for(int i = 0; i < items.length; i++)                         
+                            items[i].setPosition(x, 12 + i * 40);                
+                        
                         
                         // change the speed
-                        if(forward) {
-                            float t = 0.1f + 0.2f * (rnd.nextInt() & 0xF);
-                            setTitle("[Tweeny test] time=" +t);
-                            for(int i = 0; i < items.length; i++) 
+                        if(!forward) {
+                            final float t = 0.1f + 0.2f * (rnd.nextInt() & 0xF);
+                            setTitle("[Tweeny test] time=" + t);
+                            
+                            for(int i = 0; i < items.length; i++)                         
                                 items[i].setPositionDuration(t); 
-                        }
+                        }                        
                     }
                 } catch(Exception fi) { }                    
             }
         }.start();
+        
+        
+        // The graph window...
+        Frame f = new Frame("The euqations...");
+        int n = (int)Math.ceil(Math.sqrt( eqs.length));
+        
+        f.setVisible(true);
+        f.setSize(84 * n, 84 * n);
+        f.addWindowListener(wc);
+            
+        f.setLayout(new GridLayout(n, n));
+        for(int i = 0; i < eqs.length; i++) 
+            f.add( new EquationCanvas(eqs[i]));
+        
     }
     
     

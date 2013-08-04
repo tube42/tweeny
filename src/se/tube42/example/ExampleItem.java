@@ -26,11 +26,13 @@ public class ExampleItem extends Item
     // these are not tweened
     private int w, h;
     private Color c;
+    private String eq_name;
     
     public ExampleItem()
     {
         super(2);
         
+        eq_name = "?";
         c = new Color( rnd.nextInt() & 0xFF, rnd.nextInt() & 0xFF, rnd.nextInt() & 0xFF);
         setImmediate(ITEM_X, 0);
         setImmediate(ITEM_Y, 0);
@@ -38,8 +40,15 @@ public class ExampleItem extends Item
     
     public void draw(Graphics g)
     {
+        final int x = (int)(0.5f + getX());
+        final int y = (int)(0.5f + getY());
+        
         g.setColor(c);
-        g.fillRect( (int)(0.5f + getX()), (int)(0.5f + getY()), w, h);
+        g.fillRect( x, y, w, h);
+        
+        g.setColor(Color.BLACK);
+        g.drawString(eq_name,  32, y + 18);
+        
     }
     
     public void setSize(float w, float h)
@@ -70,5 +79,6 @@ public class ExampleItem extends Item
     {
         setEquation(ITEM_X, eq);
         setEquation(ITEM_Y, eq);
+        eq_name = eq.toString();
     }        
 }

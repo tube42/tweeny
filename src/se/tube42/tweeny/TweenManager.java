@@ -84,7 +84,7 @@ public final class TweenManager
                     ip.active = false;
                 } else {
                     w0++;
-                    ip.equation.update(ip, dt);
+                    ip.vc = ip.v0 + ip.vd * ip.equation.compute(ip.duration_inv * dt);
                 }                   
             } 
         }

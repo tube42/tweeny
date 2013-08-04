@@ -17,12 +17,13 @@ public class ExampleCanvas extends Canvas
     
     // double buffering stuff
     private int w2, h2;
-    private Image image;
     private Graphics g2;
+    private Image image;
     
     public ExampleCanvas(ExampleItem [] items)
     {
         this.items = items;
+        
         this.image = null;
         this.g2 = null;
     }
@@ -45,8 +46,8 @@ public class ExampleCanvas extends Canvas
         g2.setColor(Color.GRAY);
         g2.fillRect(0, 0, w, h);
         
-        for(int i = 0; i < items.length; i++) 
-            items[i].draw(g2);
+        for(int i = 0; i < items.length; i++)
+           items[i].draw(g2);
         
         // draw back buffer to front buffer
         g.drawImage(image, 0, 0,this);        
