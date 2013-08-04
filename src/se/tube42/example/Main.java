@@ -12,6 +12,7 @@ public class Main extends Frame
     private static final Random rnd = new Random();
     private final TweenEquation [] eqs = {
         TweenEquation.LINEAR,
+        TweenEquation.DISCRETE,        
         TweenEquation.QUAD_IN,
         TweenEquation.QUAD_OUT,
         TweenEquation.CUBE_IN,
@@ -35,7 +36,7 @@ public class Main extends Frame
                     
         // Frame stuff
         setVisible(true);
-        setSize(800, 520);        
+        setSize(800, 600);        
         addWindowListener(wc);
         
         

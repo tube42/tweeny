@@ -15,6 +15,15 @@ package se.tube42.tweeny;
     }
 }
 
+/* package */ final class DiscreteEquation implements TweenEquation 
+{
+    public String toString() { return "Discrete"; }
+    
+    public final float compute(float t)
+    {
+        return t < 0.5f ? 0 : 1;
+    }
+}
 
 /* package */ final class QuadInEquation implements TweenEquation 
 {
@@ -131,6 +140,7 @@ public interface TweenEquation
 {
     public static final TweenEquation 
           LINEAR = new LinearEquation(),
+          DISCRETE = new DiscreteEquation(),
           QUAD_IN = new QuadInEquation(),
           QUAD_OUT = new QuadOutEquation(),
           CUBE_IN = new CubeInEquation(),

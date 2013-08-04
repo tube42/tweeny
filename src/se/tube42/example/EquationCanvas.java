@@ -19,6 +19,11 @@ public class EquationCanvas extends Canvas
     }
     
     
+    public void update(Graphics g) 
+    {        
+        paint(g);
+    }    
+    
     public void paint(Graphics g) 
     {        
         final int w = getWidth(), h = getHeight();
@@ -39,7 +44,7 @@ public class EquationCanvas extends Canvas
         g.drawRect(0, 0, w, h);
         g.drawString(eq.toString(), 20, 20);
                 
-        final int COUNT = 200;
+        final int COUNT = 50;
         float x_old = 0, y_old = 0;
         
         for(int i = 0; i <= COUNT; i++) {
