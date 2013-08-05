@@ -1,10 +1,10 @@
 
-package se.tube42.example;
+package se.tube42.example.tweeny;
 
 import java.awt.*;
 import java.util.*;
 
-import se.tube42.tweeny.*;
+import se.tube42.lib.tweeny.*;
 
 
 /**
@@ -24,8 +24,8 @@ public class ExampleItem extends Item
           ;
     
     // these are not tweened
-    private int w, h;
-    private Color c;
+    public int w, h;
+    public Color c;
     private String eq_name;
     
     public ExampleItem()
@@ -55,7 +55,7 @@ public class ExampleItem extends Item
     {
         this.w = (int) w;
         this.h = (int) h;
-    }    
+    }
     
     // -------------------------------------------
     // helper functions for position tweening with Item

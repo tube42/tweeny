@@ -1,5 +1,5 @@
 
-package se.tube42.tweeny;
+package se.tube42.lib.tweeny;
 
 public class Item
 {

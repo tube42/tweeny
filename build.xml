@@ -12,11 +12,13 @@
   </target>
   
   <target name="dist" depends="compile" >
-    <jar jarfile="Tweeny.jar" basedir="${build}"/>
+    <jar jarfile="Tweeny.jar" basedir="${build}"
+      excludes="se/tube42/example/"      
+    />
   </target>
   
   <target name="run" depends="compile" >
-    <java classname="se.tube42.example.Main" fork="yes">
+    <java classname="se.tube42.example.tweeny.Main" fork="yes">
       <classpath>
         <pathelement path="${build}"/>      
       </classpath>

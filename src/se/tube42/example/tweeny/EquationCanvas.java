@@ -1,8 +1,8 @@
-package se.tube42.example;
+package se.tube42.example.tweeny;
 
 import java.awt.*;
 
-import se.tube42.tweeny.*;
+import se.tube42.lib.tweeny.*;
 
 
 /**

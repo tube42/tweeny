@@ -1,5 +1,5 @@
 
-package se.tube42.tweeny;
+package se.tube42.lib.tweeny;
 
 /**
  * This represents a single property in an Item

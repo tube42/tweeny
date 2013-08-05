@@ -1,5 +1,5 @@
 
-package se.tube42.tweeny;
+package se.tube42.lib.tweeny;
 
 /*
  * This file contains all tween equation implementations

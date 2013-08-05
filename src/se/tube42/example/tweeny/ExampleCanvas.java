@@ -1,8 +1,8 @@
-package se.tube42.example;
+package se.tube42.example.tweeny;
 
 import java.awt.*;
 
-import se.tube42.tweeny.*;
+import se.tube42.lib.tweeny.*;
 
 
 /**
@@ -46,6 +46,12 @@ public class ExampleCanvas extends Canvas
         g2.setColor(Color.GRAY);
         g2.fillRect(0, 0, w, h);
         
+        // draw the line representing current time:
+        final int x = (int)(0.5f + items[0].getX()) + items[0].w / 2;
+        g2.setColor(items[0].c);
+        g2.drawLine(x, 0, x, h);
+        
+        // draw all items
         for(int i = 0; i < items.length; i++)
            items[i].draw(g2);
         
