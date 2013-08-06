@@ -7,22 +7,60 @@ package se.tube42.lib.tweeny;
 public final class TweenManager
 {
     private static float time = 0;    
-    private static int count = 0;    
-    private static ItemProperty [] active_items = new ItemProperty[64];
+    private static int items_cnt = 0;    
+    private static ItemProperty [] items = new ItemProperty[64];
     
-    private static void grow()
-    {
-        final int old_size = active_items.length;
-        final int new_size = old_size * 2 + 2;
-        ItemProperty [] new_items = new ItemProperty[new_size];
-        for(int i = 0; i < old_size; i++) 
-            new_items[i] = active_items[i];
-        active_items = new_items;
-    }
+    private static int animations_cnt = 0;
+    private static Animation [] animations = new Animation[16];
+    
+          
     
     public static float getTime()
     {
         return time;
+    }
+    
+    // ---------------------------------------------------------
+    // Animation stuff
+    
+    private static void grow_animations()
+    {
+        final int old_size = animations.length;
+        final int new_size = old_size * 2 + 2;
+        Animation [] new_animations = new Animation[new_size];
+        for(int i = 0; i < old_size; i++) 
+            new_animations[i] = animations[i];
+        animations = new_animations;
+    }    
+    
+    /* packate */ static void add(Animation anim)
+    {
+        anim.reset();        
+        if(anim.active) return; // already in qeue
+        
+        if(animations_cnt >=  animations.length)
+            grow_animations();
+        
+        anim.active = true;
+        animations[animations_cnt++] = anim;
+    }
+    
+    /* packate */ static void remove(Animation anim)
+    {
+        anim.active = false;
+    }
+    
+    // ---------------------------------------------------------
+    // ItemProperty stuff
+    
+    private static void grow_items()
+    {
+        final int old_size = items.length;
+        final int new_size = old_size * 2 + 2;
+        ItemProperty [] new_items = new ItemProperty[new_size];
+        for(int i = 0; i < old_size; i++) 
+            new_items[i] = items[i];
+        items = new_items;
     }
     
     /* package */ static void add(ItemProperty ip)
@@ -33,17 +71,16 @@ public final class TweenManager
         
         if(ip.active) return;
                 
-        if(count >=  active_items.length)
-            grow();
+        if(items_cnt >=  items.length)
+            grow_items();
         
         ip.active = true;
-        active_items[count++] = ip;                
+        items[items_cnt++] = ip;                
     }
     
    
     /* package */ static void remove(ItemProperty ip)
     {
-        if(!ip.active) return;        
         ip.active = false;  // will be removed in the service loop
     }
        
@@ -52,9 +89,9 @@ public final class TweenManager
      * drop it where it is now */
     public static void removeTweens(boolean finish)
     {
-        for(int i = 0; i < count; i++)
-            active_items[i].removeTween(finish);
-        count = 0;
+        for(int i = 0; i < items_cnt; i++)
+            items[i].removeTween(finish);
+        items_cnt = 0;
     }
     
     /**
@@ -63,18 +100,20 @@ public final class TweenManager
      */
     
     public static boolean service(float delta_time)
-    {
-        final int len = count;
-           
-        /* this sanity check will help removing some error vectors later on */
-        if(delta_time <= 0) return len == 0;
+    {        
+        // this sanity check will help removing some error vectors later on
+        if(delta_time <= 0) return (items_cnt + animations_cnt) > 0;
         time += delta_time;
-           
+        
+        boolean active = false;
+        
+        // service items
+        final int items_len = items_cnt;        
         int w0 = 0;                           
-        for(int r0 = 0; r0 < len; r0++) {
-            final ItemProperty ip = active_items[r0];
+        for(int r0 = 0; r0 < items_len; r0++) {
+            final ItemProperty ip = items[r0];
             
-            if(w0 != r0) active_items[w0] = ip;
+            if(w0 != r0) items[w0] = ip;
             
             if(ip.active) {
                 final float dt = time - ip.time_start;
@@ -88,8 +127,29 @@ public final class TweenManager
                 }                   
             } 
         }
-        count = w0;
+        items_cnt = w0;        
+        active |= items_cnt != 0;
         
-        return count != 0;
+        
+        // service animations:
+        final int animations_len = animations_cnt;                
+        w0 = 0;                           
+        for(int r0 = 0; r0 < animations_len; r0++) {
+            final Animation an = animations[r0];            
+            if(w0 != r0) animations[w0] = an;
+            
+            if(an.active) {
+                active |= an.service(delta_time);
+                
+                if(!an.active && an.on_finish != null)
+                    an.on_finish.run();
+            }
+            if(an.active)
+                w0++;           
+        }
+        animations_cnt = w0;        
+        
+        
+        return active;
     }
 }

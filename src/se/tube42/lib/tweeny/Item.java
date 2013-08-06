@@ -3,8 +3,7 @@ package se.tube42.lib.tweeny;
 
 public class Item
 {
-
-    private ItemProperty [] properties;
+    /* package */ ItemProperty [] properties;
 
     /**
      * create an item with the given number of properties
@@ -60,7 +59,5 @@ public class Item
     public final void set(int index, float v0, float v1)
     {
         properties[index].set(v0, v1);          
-    }
-    
-    
+    }        
 }

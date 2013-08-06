@@ -12,7 +12,7 @@ When to use it?
 Tweeny may be of use to you if 
  1) you need a tiny tweening library, with the simplest possible API
  2) you have very few tweened objects (or don't care about memory usage)
- 3) you sometimes want to specify assignment speed instead of tween sequences (i.e. something like Behavior in QML)
+ 3) you sometimes want to specify assignment behavior instead of tween sequences (i.e. something like Behavior in QML)
  
 
 WHY?
