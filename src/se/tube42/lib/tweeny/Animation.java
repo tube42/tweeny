@@ -98,7 +98,7 @@ public final class Animation
     }
     
     /** start the animation sequence if it is active */
-    private final void stop()
+    public final void stop()
     {
         TweenManager.remove(this);
         

@@ -14,7 +14,7 @@ Assume we have two variables we would like to tween. For this we will create an 
  . . .
  Item item = new Item(2);
 
-You can access each variable with the help of member functions in Item. Assume for example that we want to write and read the value of the first variable:
+To access these variables, you simply do
 ::
  // set variable 0 to 1.0 right now
  item.setImmediate(0, 1.0f);
@@ -29,7 +29,7 @@ variable towards that value within the given time
  item.setDuration(0, 2.0f);
  item.set(0, 3.5f);
 
-That's basically all there is to it. The only other thing you need to remember is to call *TweenManager.service(dt)* in your game loop (the dt parameter is the frame time in seconds).
+That's basically all there is to it. The only other thing you need to remember is to call the *TweenManager.service(long dt)* in your game loop (the dt parameter is the frame time in milliseconds).
 
 Tween equations
 ~~~~~~~~~~~~~~~

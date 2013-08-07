@@ -44,7 +44,7 @@ public class DemoCanvas extends Canvas
            items[i].draw(g2);
         
         // draw back buffer to front buffer
-        g.drawImage(image, 0, 0,this);        
+        g.drawImage(image, 0, 0, this);   
     }
     
     // this will create a back buffer of the right size...

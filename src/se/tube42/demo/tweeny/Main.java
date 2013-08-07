@@ -16,32 +16,44 @@ public class Main extends Frame implements Runnable, MouseListener
     private BoxItem [] items;    
     private int state;
     
-    private Animation press_anim0, press_anim1, press_anim2;
+    private Animation press_anim0, press_anim1, press_anim2, stop_anim0;
     private Checkbox animate, slowdown;
     
     public Main()
     {                
         this.state = 0;
         this.items = new BoxItem[3];
-        this.items[0] = new BoxItem(Color.RED, 20, 20);
-        this.items[1] = new BoxItem(Color.BLUE, 200, 20);
-        this.items[2] = new BoxItem(Color.GREEN, 110, 200);
+        this.items[0] = new BoxItem(Color.RED, 210, 210);
+        this.items[1] = new BoxItem(Color.BLUE, 20, 20);
+        this.items[2] = new BoxItem(Color.GREEN, 400, 20);
         
+        
+        items[0].setEquation(BoxItem.ITEM_X, TweenEquation.QUAD_OUT);
+        items[0].setEquation(BoxItem.ITEM_Y, TweenEquation.QUAD_OUT);
         
         AnimationBuilder ab = new AnimationBuilder();
-        int ids = ab.addProperty(items[0], BoxItem.ITEM_S, 1f);
-        ab.set(ids, TweenEquation.LINEAR, 0.9f, 0.1f);
-        ab.set(ids, TweenEquation.LINEAR, 1.1f, 0.1f);
-        ab.set(ids, TweenEquation.ELASTIC_IN, 1f, 0.3f);
+        int id1 = ab.addProperty(items[0], BoxItem.ITEM_SW, 1f);
+        int id2 = ab.addProperty(items[0], BoxItem.ITEM_SH, 1f);
+        ab.set(id1, TweenEquation.QUAD_IN, 0.9f, 0.1f, 1.1f, 0.1f, 1f, 0.2f);        
+        ab.set(id2, TweenEquation.QUAD_IN, 0.9f, 0.1f, 1.1f, 0.1f, 1f, 0.2f);
         press_anim0 = ab.build(null);
         
         // clone it and make it tween item1 instead
         press_anim1 = new Animation( press_anim0);
-        press_anim1.replaceProperty(ids, items[1], BoxItem.ITEM_S);
+        press_anim1.replaceProperty(id1, items[1], BoxItem.ITEM_SW);
+        press_anim1.replaceProperty(id2, items[1], BoxItem.ITEM_SH);
         
         // same for #2
         press_anim2 = new Animation( press_anim0);
-        press_anim2.replaceProperty(ids, items[2], BoxItem.ITEM_S);
+        press_anim2.replaceProperty(id1, items[2], BoxItem.ITEM_SW);
+        press_anim2.replaceProperty(id2, items[2], BoxItem.ITEM_SH);
+        
+        
+        // the stop animation
+        ab.reset();
+        id2 = ab.addProperty(items[0], BoxItem.ITEM_SH, 1f);
+        ab.set(id2, TweenEquation.QUAD_IN, 0.95f, 0.05f, 1f, 0.2f);
+        stop_anim0 = ab.build(null);
         
         
         // this canvas will draw all items
@@ -64,7 +76,7 @@ public class Main extends Frame implements Runnable, MouseListener
         };
         
         setVisible(true);
-        setSize(500, 360);
+        setSize(500, 600);
         setLocation(10, 10);        
         addWindowListener(wc);
         
@@ -119,23 +131,41 @@ public class Main extends Frame implements Runnable, MouseListener
         if(items[0].hit(x, y)) {
             state = (state + 1) & 3;
             switch(state) {
-            case 0: items[1].setPosition( 200,  20); break;
-            case 1: items[1].setPosition( 200, 200); break;
-            case 2: items[1].setPosition( 400, 200); break;
-            case 3: items[1].setPosition( 400,  20); break;                
+            case 0: 
+                items[1].setPosition( 20 , 20); 
+                items[2].setPosition( 400, 20); 
+                break;
+            case 1: 
+                items[1].setPosition( 20 , 400); 
+                items[2].setPosition( 400, 400); 
+                break;
+            case 2: 
+                items[1].setPosition( 400, 400); 
+                items[2].setPosition( 20 , 400); 
+                break;
+            case 3: 
+                items[1].setPosition( 400,  20); 
+                items[2].setPosition( 20 ,  20);                 
+                break;                
             }
         }        
         
         if(items[1].hit(x, y)) {            
-            float x1 = items[2].getX() - 20;
-            if(x1 < 20) x1 = 200;
-            items[2].setPosition(x1, items[2].getY());
+            float y1 = items[0].getY() - 20;
+            if(y1 < 20) {
+                stop_anim0.start();
+                y1= 20;
+            }
+            items[0].setPosition(items[0].getX(), y1);
         }
         
         if(items[2].hit(x, y)) {            
-            float x1 = items[2].getX() + 20;
-            if(x1 > 200) x1 = 20;
-            items[2].setPosition(x1, items[2].getY());
+            float y1 = items[0].getY() + 20;
+            if(y1 > 400) {
+                stop_anim0.start();
+                y1 = 400;
+            }
+            items[0].setPosition(items[0].getX(), y1);
         }
     }
     

@@ -26,7 +26,7 @@ public final class TweenManager
         animations = new_animations;
     }    
     
-    /* packate */ static void add(Animation anim)
+    /* packate */ static final void add(Animation anim)
     {
         anim.reset();        
         if(anim.active) return; // already in queue
@@ -38,10 +38,21 @@ public final class TweenManager
         animations[animations_cnt++] = anim;
     }
     
-    /* packate */ static void remove(Animation anim)
+    /* packate */ static final void remove(Animation anim)
     {
         anim.active = false;
     }
+    
+    /** 
+     * remove all currently active animations.
+     */
+    public static void removeAnimations()
+    {
+        for(int i = 0; i < animations_cnt; i++)
+            animations[i].stop();
+        animations_cnt = 0;
+    }
+    
     
     // ---------------------------------------------------------
     // ItemProperty stuff    
@@ -67,7 +78,7 @@ public final class TweenManager
             grow_items();
         
         ip.active = true;
-        items[items_cnt++] = ip;                
+        items[items_cnt++] = ip;  
     }
     
    
@@ -76,7 +87,8 @@ public final class TweenManager
         ip.active = false;  // will be removed in the service loop
     }
        
-    /** remove all currently active tweens.
+    /** 
+     * remove all currently active tweens.
      * if finish is true it will finish the movement, otherwise just
      * drop it where it is now */
     public static void removeTweens(boolean finish)
@@ -90,7 +102,7 @@ public final class TweenManager
      * service the tweens for this frame.
      * returns false when tween queue is empty
      * 
-     * delta_time is frame time in miliseconds
+     * delta_time is frame time in milliseconds
      */
     
     public static boolean service(long delta_time)

@@ -15,7 +15,9 @@ import java.util.*;
 
 
 /**
- * this is a heavy weight class used to create animations
+ * This is a heavy weight class used to create animations.
+ * 
+ * To re-use an AnimationBuilder object, call reset()
  */
 
 public final class AnimationBuilder
@@ -42,7 +44,6 @@ public final class AnimationBuilder
       
     public AnimationBuilder()
     {
-        prop_obj = new ItemProperty[MAX_PROPS];
         prop_time = new float[MAX_PROPS];
         prop_start = new float[MAX_PROPS];
         actions = new ArrayList<AnimationAction>();        
@@ -53,6 +54,7 @@ public final class AnimationBuilder
     public void reset()
     {
         prop_cnt = 0;
+        prop_obj = new ItemProperty[MAX_PROPS];        
         actions.clear();
     }
     

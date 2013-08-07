@@ -12,8 +12,11 @@ public class BoxItem extends Item
     public static final int
           ITEM_X = 0,
           ITEM_Y = 1,
-          ITEM_S = 2
+          ITEM_SW = 2,
+          ITEM_SH = 3
           ;
+    
+    public static final int SIZE = 60;
     
     // these are not tweened
     public int w, h;
@@ -21,37 +24,39 @@ public class BoxItem extends Item
     
     public BoxItem(Color c, int x, int y)
     {
-        super(3);
+        super(4);
         
         this.c = c;
-        this.w = 64;
-        this.h = 64;
+        this.w = SIZE;
+        this.h = SIZE;
         
         setImmediate(ITEM_X, x);
         setImmediate(ITEM_Y, y);
-        setImmediate(ITEM_S, 1);
+        setImmediate(ITEM_SW, 1);
+        setImmediate(ITEM_SH, 1);
         
         setDuration(ITEM_X, 0.3f);
         setDuration(ITEM_Y, 0.3f);                
-        setEquation(ITEM_X, TweenEquation.QUAD_IN);
-        setEquation(ITEM_Y, TweenEquation.QUAD_IN);
+        setEquation(ITEM_X, TweenEquation.BACK_OUT);
+        setEquation(ITEM_Y, TweenEquation.BACK_OUT);
     }
     
     public void draw(Graphics g)
     {        
-        final float s = getScale();
+        final float sw = getWidthScale();
+        final float sh = getHeightScale();
         final float x = getX();
         final float y = getY();
         
-        final float x0 = x + (1 - s) * w / 2;
-        final float y0 = y + (1 - s) * h / 2;
+        final float x0 = x + (1 - sw) * w / 2;
+        final float y0 = y + (1 - sh) * h / 2;
         
         g.setColor(c);
         g.fillRect( 
                   (int) (x0),
                   (int) (y0),
-                  (int) (w * s),
-                  (int) (h * s)
+                  (int) (w * sw),
+                  (int) (h * sh)
                   );
                   
     }
@@ -72,14 +77,23 @@ public class BoxItem extends Item
         set(ITEM_X, x);
         set(ITEM_Y, y);
     }
+    
     public void setScale(float s)
     {
-        set(ITEM_S, s);
+        set(ITEM_SW, s);
+        set(ITEM_SH, s);
+    }
+    
+    public void setScale(float sw, float sh)
+    {
+        set(ITEM_SW, sw);
+        set(ITEM_SH, sh);
     }
     
     public float getX() { return get(ITEM_X); }
     public float getY() { return get(ITEM_Y); }
-    public float getScale() { return get(ITEM_S); }
+    public float getWidthScale() { return get(ITEM_SW); }
+    public float getHeightScale() { return get(ITEM_SH); }
     
     
     
