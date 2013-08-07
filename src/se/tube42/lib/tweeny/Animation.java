@@ -41,8 +41,8 @@ public final class Animation
         this.active = false;
     }
     
-    /** reset animation */
-    public void reset()
+    // reset animation, called by TweenManger after start()
+    /* package */ void reset()
     {
         cnt_kf = 0;
         cnt_kf_count = 0;

@@ -25,7 +25,22 @@
     </java>
   </target>
   
+  <target name="doc" depends="compile" >
+    <javadoc sourcepath="src" destdir="docs" packagenames="se.tube42.lib.*" />
+  </target>
+  
+  <target name="help">
+    <echo>
+      build   build the code
+      run     runs the example code
+      dist    create library jar file
+      doc     create API docs
+      clean   clean up
+    </echo>
+  </target>
   <target name="clean"  description="clean up" >
     <delete dir="${build}"/>
+    <delete dir="docs"/>    
+    <delete file="Tweeny.jar" />
   </target>
 </project>

@@ -2,7 +2,7 @@
 package se.tube42.lib.tweeny;
 
 /**
- * Tween manager, handles the frame movement
+ * Tween manager, handles the frame movement. 
  */
 public final class TweenManager
 {
@@ -14,7 +14,7 @@ public final class TweenManager
     private static Animation [] animations = new Animation[16];
     
           
-    
+    /** get elapsed time */
     public static float getTime()
     {
         return time;

@@ -3,10 +3,6 @@ package se.tube42.lib.tweeny;
 
 import java.util.*;
 
-/**
- * this is a heavy weight class used to create animations
- */
-
 // internal data for AnimationBuilder
 /* package */ final class AnimationAction
 {
@@ -16,6 +12,11 @@ import java.util.*;
     public float duration;
     public TweenEquation eq;
 }
+
+
+/**
+ * this is a heavy weight class used to create animations
+ */
 
 public final class AnimationBuilder
 {
