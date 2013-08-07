@@ -36,7 +36,7 @@ public final class TweenManager
     /* packate */ static void add(Animation anim)
     {
         anim.reset();        
-        if(anim.active) return; // already in qeue
+        if(anim.active) return; // already in queue
         
         if(animations_cnt >=  animations.length)
             grow_animations();

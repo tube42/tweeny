@@ -36,19 +36,19 @@ public class Main extends Frame
                 System.exit(0);
             }
         };
-                    
+        
         // Frame stuff
         setVisible(true);
         setSize(400, 600);        
         addWindowListener(wc);
-                
+        
         // create two items
         final ExampleItem [] items = new ExampleItem[ eqs.length];
         for(int i = 0; i < items.length; i++) {
             ExampleItem it = items[i] = new ExampleItem();
             it.setPosition(132, 12 + i * 40);
             it.setSize(33, 33);            
-            it.setPositionEquation(eqs[i]);
+            it.setPositionEquation(eqs[i]);            
         }
         TweenManager.removeTweens(true); // commit all tweens
         
@@ -62,34 +62,26 @@ public class Main extends Frame
         for(int i = 0; i < items.length; i++) {
             final ExampleItem ei = items[i];
             final ExampleItem ei2 = items[ (i + 4) % items.length];
-            final float t = 0.3f + 0.05f * (rnd.nextInt() & 7);            
+            final float t = 0.3f + 0.05f * (rnd.nextInt() & 7); 
             int idy = ab.addProperty(ei, ExampleItem.ITEM_Y, -100);
             ab.pause(idy, 2f);                                  
-            ab.set(idy, ei2.getY(), t, TweenEquation.BACK_OUT);
+            ab.set(idy, TweenEquation.BACK_OUT, ei2.getY(), t);
             ab.pause(idy, 1f);                      
-            ab.set(idy, ei.getY(), 1, TweenEquation.BACK_OUT);
+            ab.set(idy, TweenEquation.BACK_IN, ei.getY(), 1);
         }
-        final float synctime = ab.synchronize();
         
-        for(int i = 0; i < items.length; i++) {
-            final ExampleItem ei = items[i];
-            final float t = 0.1f + 0.05f * (rnd.nextInt() & 7);
-            int idx = ab.addProperty(ei, ExampleItem.ITEM_X, ei.getX());
-            ab.pauseUntil(idx, synctime);
-            ab.set(idx, ei.getX() + 50, t, TweenEquation.BACK_OUT);
-            ab.set(idx, ei.getX() - 50, t, TweenEquation.BACK_OUT);
-            ab.set(idx, ei.getX(), t, TweenEquation.BACK_OUT);
-        }
         
         final Animation anim = ab.build(new Runnable() {
                   public void run(){
-                  System.out.println("FYI: animation ended");
+                  System.out.println("FYI: animation ended. Reseting equations");
+                  for(int i = 0; i < items.length; i++) items[i].setPositionEquation(eqs[i]);                          
+                  
               }
               });
         System.out.println("FYI: starting the initial animation");
         anim.start();            
-                        
-              
+        
+        
         // the worker thread will update the world time and request the canvas to draw the items
         new Thread() {
             public void run() {
@@ -110,8 +102,9 @@ public class Main extends Frame
                         // nothing to tween? move some stuff                        
                         forward = !forward;                        
                         int x = forward ? 132 : c.getWidth() - 80 - 32;
-                        for(int i = 0; i < items.length; i++)                         
+                        for(int i = 0; i < items.length; i++) {
                             items[i].setPosition(x, 12 + i * 40);                
+                        }
                         
                         // change the speed
                         if(!forward) {
@@ -135,7 +128,7 @@ public class Main extends Frame
         f.setVisible(true);
         f.setSize(84 * n, 84 * n);
         f.addWindowListener(wc);
-            
+        
         f.setLayout(new GridLayout(n, n));
         for(int i = 0; i < eqs.length; i++) 
             f.add( new EquationCanvas(eqs[i]));        
