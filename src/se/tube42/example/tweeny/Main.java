@@ -92,7 +92,7 @@ public class Main extends Frame
                         do {
                             Thread.sleep(1000 / 100); // this is not really 100fps, the time is not that accurate ...
                             long t_now = System.currentTimeMillis();
-                            working = TweenManager.service( (t_now - t_old) / 1000.0f);
+                            working = TweenManager.service(t_now - t_old);
                             
                             t_old = t_now;
                             c.repaint();

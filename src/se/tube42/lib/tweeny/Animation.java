@@ -41,6 +41,38 @@ public final class Animation
         this.active = false;
     }
     
+    /** 
+     * Clone an existing animation.
+     * Use this instead of creating a new Animation using AnimationBuilder
+     * if all you want to do is to run an identical animation with
+     * different properties
+     */
+    public Animation(Animation clone)
+    {
+        this.ips = new ItemProperty[clone.max_ips];
+        for(int i = 0; i < this.ips.length; i++)
+            this.ips[i] = clone.ips[i];
+        
+        this.max_ips = clone.max_ips;
+        this.max_kf = clone.max_kf;
+        this.kf_start_time = clone.kf_start_time;
+        this.kf_member_count = clone.kf_member_count;
+        this.val_dur = clone.val_dur;
+        this.eqs = clone.eqs;
+        this.active = false;
+        
+    }
+    
+    /**
+     * use this function to replace a property with a different one.
+     * All animation timing, values etc. will remain as before
+     */
+    public void replaceProperty(int current_id, Item new_item, int new_index)
+    {
+        if(current_id < 0 || current_id >= max_ips) return;
+        ips[current_id] = new_item.properties[new_index];
+    }
+              
     // reset animation, called by TweenManger after start()
     /* package */ void reset()
     {
@@ -51,14 +83,15 @@ public final class Animation
         next_time = kf_start_time[0];
         curr_time = 0;
         
-        // set initial values
+        // stop current tweens and set initial values
         for(int i = 0; i < max_ips; i++) {
             final float val = val_dur[cnt_val++];
+            ips[i].removeTween(false);
             ips[i].setImmediate(val);
         }
     }
     
-    /** start the animation sequence, will restart it if already active */
+    /** sttop the animation sequence, will restart it if already active */
     public void start()
     {
         TweenManager.add(this);
@@ -71,9 +104,9 @@ public final class Animation
         
     }
     
-    /* package */ boolean service(float dt)
+    /* package */ boolean service(long dt)
     {
-        curr_time += dt;
+        curr_time += dt / 1000f;
         
         while(cnt_kf < max_kf && curr_time >= next_time)
             do_one_kf();                   

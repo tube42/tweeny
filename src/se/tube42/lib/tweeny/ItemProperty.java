@@ -13,7 +13,7 @@ package se.tube42.lib.tweeny;
     
     /* package */ float v0, v1, vd, vc;
     /* package */ float duration, duration_inv;
-    /* package */ float time_start;
+    /* package */ long time_start;
     /* package */ boolean active;
     /* package */ TweenEquation equation;
     
@@ -28,9 +28,11 @@ package se.tube42.lib.tweeny;
         setDuration(1f);
     }
     
+    /** set the equation if not null */
     public final void setEquation(TweenEquation equation)
     {
-        this.equation = equation;
+        if(equation != null)
+            this.equation = equation;
     }
     
     public final float getDuration()

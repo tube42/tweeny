@@ -6,20 +6,13 @@ package se.tube42.lib.tweeny;
  */
 public final class TweenManager
 {
-    private static float time = 0;    
+    private static long time = 0;    
     private static int items_cnt = 0;    
     private static ItemProperty [] items = new ItemProperty[64];
     
     private static int animations_cnt = 0;
     private static Animation [] animations = new Animation[16];
-    
-          
-    /** get elapsed time */
-    public static float getTime()
-    {
-        return time;
-    }
-    
+       
     // ---------------------------------------------------------
     // Animation stuff
     
@@ -51,8 +44,7 @@ public final class TweenManager
     }
     
     // ---------------------------------------------------------
-    // ItemProperty stuff
-    
+    // ItemProperty stuff    
     private static void grow_items()
     {
         final int old_size = items.length;
@@ -66,7 +58,7 @@ public final class TweenManager
     /* package */ static void add(ItemProperty ip)
     {
         // do this before active check!        
-        ip.time_start = time; 
+        ip.time_start = time;
         ip.vc = ip.v0;
         
         if(ip.active) return;
@@ -97,9 +89,11 @@ public final class TweenManager
     /**
      * service the tweens for this frame.
      * returns false when tween queue is empty
+     * 
+     * delta_time is frame time in miliseconds
      */
     
-    public static boolean service(float delta_time)
+    public static boolean service(long delta_time)
     {        
         // this sanity check will help removing some error vectors later on
         if(delta_time <= 0) return (items_cnt + animations_cnt) > 0;
@@ -116,7 +110,7 @@ public final class TweenManager
             if(w0 != r0) items[w0] = ip;
             
             if(ip.active) {
-                final float dt = time - ip.time_start;
+                final float dt = (time - ip.time_start) / 1000f;
                 ip.flags |= ItemProperty.FLAGS_CHANGED;
                 if(dt >= ip.duration) {
                     ip.vc = ip.v0 + ip.vd;
@@ -125,7 +119,7 @@ public final class TweenManager
                     w0++;
                     ip.vc = ip.v0 + ip.vd * ip.equation.compute(ip.duration_inv * dt);
                 }                   
-            } 
+            }
         }
         items_cnt = w0;        
         active |= items_cnt != 0;
@@ -149,6 +143,10 @@ public final class TweenManager
         }
         animations_cnt = w0;        
         
+        
+        // lets restart the counter, jut for the fun of it...
+        if(animations_cnt + items_cnt == 0)
+            time = 0;
         
         return active;
     }
