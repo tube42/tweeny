@@ -12,9 +12,7 @@
   </target>
   
   <target name="dist" depends="compile" >
-    <jar jarfile="Tweeny.jar" basedir="${build}"
-      excludes="se/tube42/example/"      
-    />
+    <jar jarfile="Tweeny.jar" basedir="${build}" includes="se/tube42/lib/**" />
   </target>
   
   <target name="example" depends="compile" >
