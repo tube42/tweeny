@@ -8,8 +8,8 @@ import java.util.*;
 {
     public int index;
     public float value;
-    public float start_time;
-    public float duration;
+    public int start_time;
+    public int duration;
     public TweenEquation eq;
 }
 
@@ -26,9 +26,7 @@ public final class AnimationBuilder
     // this Comparator is used to sort action by their start time
     protected static Comparator<AnimationAction> comp = new Comparator<AnimationAction>() {
         public int compare(AnimationAction a, AnimationAction b) {
-            if(a.start_time > b.start_time) return +1;
-            if(a.start_time < b.start_time) return -1;
-            return 0;
+            return a.start_time - b.start_time;
         }
     };
     
@@ -89,11 +87,11 @@ public final class AnimationBuilder
             final float value = val_dur[i + 0];
             final float duration = val_dur[i + 1];
             aa.index = id;
-            aa.duration = duration;
-            aa.start_time = prop_time[id];
+            aa.duration   = Math.max(1, (int)(0.5f + 1000f * duration));
+            aa.start_time = (int)(0.5 + 1000f * prop_time[id]);
             aa.value = value;
             aa.eq = eq;
-            
+                        
             prop_time[id] += duration;
             actions.add(aa);
         }
@@ -102,7 +100,7 @@ public final class AnimationBuilder
     
     /** add pause to a timeline for the given duration */
     public void pause(int id, float duration)
-    {        
+    { 
         if(id < 0 || id >= prop_cnt) return; // invalid id        
         prop_time[id] += duration;
     }
@@ -142,7 +140,7 @@ public final class AnimationBuilder
         
         // find the number of key frames
         int frames = 0;
-        float last_start = -2;
+        int last_start = -2;
         for(AnimationAction aa : actions) {
             if(aa.start_time != last_start) {
                 frames ++;
@@ -151,35 +149,40 @@ public final class AnimationBuilder
         }
         
         // warning: unreadable & crazy code to follow
-        Animation anim = new Animation(prop_obj, prop_cnt, frames, actions.size());
-        int cnt_kf = 0, cnt_count = 0, cnt_val = 0, cnt_eq = 0;
+        Animation anim = new Animation(prop_obj, 
+                  prop_cnt, 
+                  frames + 1, 
+                  actions.size());
+        int cnt_data = 0, cnt_val = 0, index_count = 0, cnt_eqs = 0;
         last_start = -1;
         
         // insert the initial values in a key-frame
         for(int i = 0; i < prop_cnt; i++)
-            anim.val_dur[cnt_val++] = prop_start[i];        
+            anim.value[cnt_val++] = prop_start[i];        
         
         // insert the rest
-        int loc_count = 0;
-        float last_end = getTime();
+        int last_end = (int)(0.5f + 1000 * getTime());
         for(AnimationAction aa : actions) {
             last_end = Math.max(last_end, aa.start_time + aa.duration);
+            
             if(aa.start_time != last_start) {
-                loc_count = cnt_count;                
-                anim.kf_member_count[cnt_count++] = 0;
-                anim.kf_start_time[cnt_kf++] = last_start = aa.start_time;
+                anim.data[cnt_data++] = last_start = aa.start_time;
+                index_count = cnt_data;
+                anim.data[cnt_data++] = 0;
             }
-            anim.kf_member_count[loc_count]++;
-            anim.kf_member_count[cnt_count++] = aa.index; 
-            anim.val_dur[cnt_val++] = aa.value;
-            anim.val_dur[cnt_val++] = aa.duration;
-            anim.eqs[cnt_eq++] = aa.eq;
+            
+            anim.data[index_count]++;
+            anim.data[cnt_data++] = aa.index; 
+            anim.data[cnt_data++] = aa.duration;
+            
+            anim.value[cnt_val++] = aa.value;
+            anim.eqs[cnt_eqs++] = aa.eq;
         }
         
-        // final frame has no movements, it is just there so we 
-        // can detect the end and clal on_finish
-        anim.kf_member_count[cnt_count] = 0;
-        anim.kf_start_time[cnt_kf] = last_end;
+        // final frame has no movements, it is just there so we
+        // can detect the end and call on_finish
+        anim.data[cnt_data++] = last_end;
+        anim.data[cnt_data++] = 0; // zero members
         
         anim.on_finish = on_finish;
         

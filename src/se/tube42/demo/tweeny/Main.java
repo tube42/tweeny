@@ -108,7 +108,7 @@ public class Main extends Frame implements Runnable, MouseListener
                 canvas.repaint();
             }
         } catch(Exception error) {
-            error.printStackTrace();
+            System.out.println("ERROR " + error);
             System.exit(0);
         }
     }

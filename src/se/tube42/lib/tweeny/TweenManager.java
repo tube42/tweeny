@@ -6,7 +6,12 @@ package se.tube42.lib.tweeny;
  */
 public final class TweenManager
 {
-    private static long time = 0;    
+    // Optimally, we want time as a float so we don't need to do a FP division by 1000.0,
+    // but as the float time grows, addition with small numbers will stop working.
+    // Hence we track time with a long and convert it to a float.
+    // To avoid further problems, we also reset then when no tweens or animations are queued
+    private static long time_l = 0;    
+    private static float time_f = 0;
     private static int items_cnt = 0;    
     private static ItemProperty [] items = new ItemProperty[64];
     
@@ -69,7 +74,7 @@ public final class TweenManager
     /* package */ static void add(ItemProperty ip)
     {
         // do this before active check!        
-        ip.time_start = time;
+        ip.time_start = time_f;
         ip.vc = ip.v0;
         
         if(ip.active) return;
@@ -109,7 +114,8 @@ public final class TweenManager
     {        
         // this sanity check will help removing some error vectors later on
         if(delta_time <= 0) return (items_cnt + animations_cnt) > 0;
-        time += delta_time;
+        time_l += delta_time;        
+        time_f = time_l / 1000f;
         
         boolean active = false;
         
@@ -122,7 +128,8 @@ public final class TweenManager
             if(w0 != r0) items[w0] = ip;
             
             if(ip.active) {
-                final float dt = (time - ip.time_start) / 1000f;
+                // final float dt = (time - ip.time_start) / 1000f;
+                final float dt = time_f - ip.time_start;
                 ip.flags |= ItemProperty.FLAGS_CHANGED;
                 if(dt >= ip.duration) {
                     ip.vc = ip.v0 + ip.vd;
@@ -156,9 +163,11 @@ public final class TweenManager
         animations_cnt = w0;        
         
         
-        // lets restart the counter, jut for the fun of it...
-        if(animations_cnt + items_cnt == 0)
-            time = 0;
+        // lets restart the counter, this will help us avoid FP problems
+        if(animations_cnt + items_cnt == 0) {
+            time_l = 0;
+            time_f = 0;
+        }
         
         return active;
     }

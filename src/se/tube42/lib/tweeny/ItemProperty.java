@@ -13,7 +13,7 @@ package se.tube42.lib.tweeny;
     
     /* package */ float v0, v1, vd, vc;
     /* package */ float duration, duration_inv;
-    /* package */ long time_start;
+    /* package */ float time_start;
     /* package */ boolean active;
     /* package */ TweenEquation equation;
     

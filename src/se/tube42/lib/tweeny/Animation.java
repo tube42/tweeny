@@ -14,29 +14,23 @@ public final class Animation
     // everything is packed into a few large arrays
     
     /* package */ ItemProperty [] ips;
-    /* package */ float [] kf_start_time; // |time0|time1|...
-    /* package */ int [] kf_member_count; // |count0|mem0|mem1|...|count1|...
-    /* package */ float [] val_dur;       // |init0|init1|... |val0|dur0|val1|dur1|...|val1|dur1|...
-    /* package */ TweenEquation [] eqs;   // |eq0|eq1|...
+    /* package */ int [] data;        // |time0|count0|mem0|dur0|mem1|dur1|...|time1|count1|
+    /* package */ float [] value;       // |init0|init1|... |val0|val1|..
+    /* package */ TweenEquation [] eqs;  // |eq0|eq1|...
     /* package */ boolean active;
     /* package */ Runnable on_finish;     // run this when we are done
     
-    private int max_kf;
-    private int cnt_kf;
-    private int cnt_kf_count;
-    private int cnt_val;
-    private int cnt_eqs;
-    private int max_ips;
-    private float curr_time, next_time;
+    private int max_kf, max_ips;
+    private int cnt_data, cnt_val, cnt_eqs, cnt_kf;
+    private int curr_time, next_time;
     
     /* package */ Animation(ItemProperty [] ips, int ips_count, int kf_count, int val_count)
     {
         this.ips = ips;
         this.max_ips = ips_count;
-        this.max_kf = kf_count + 1;
-        this.kf_start_time = new float[kf_count + 1];
-        this.kf_member_count = new int[kf_count + 1 + val_count];
-        this.val_dur = new float[val_count * 2 +  ips_count];
+        this.max_kf = kf_count;
+        this.data = new int[kf_count * 2 + val_count * 2];
+        this.value = new float[val_count + ips_count];
         this.eqs = new TweenEquation[val_count];
         this.active = false;
     }
@@ -52,12 +46,12 @@ public final class Animation
         this.ips = new ItemProperty[clone.max_ips];
         for(int i = 0; i < this.ips.length; i++)
             this.ips[i] = clone.ips[i];
-        
+                
         this.max_ips = clone.max_ips;
         this.max_kf = clone.max_kf;
-        this.kf_start_time = clone.kf_start_time;
-        this.kf_member_count = clone.kf_member_count;
-        this.val_dur = clone.val_dur;
+        
+        this.data = clone.data;
+        this.value = clone.value; 
         this.eqs = clone.eqs;
         this.active = false;
         
@@ -76,16 +70,13 @@ public final class Animation
     // reset animation, called by TweenManger after start()
     /* package */ void reset()
     {
-        cnt_kf = 0;
-        cnt_kf_count = 0;
-        cnt_val = 0;
-        cnt_eqs = 0;
-        next_time = kf_start_time[0];
+        cnt_val = cnt_eqs = cnt_data = cnt_kf = 0;
+        next_time = data[cnt_data++];
         curr_time = 0;
         
         // stop current tweens and set initial values
         for(int i = 0; i < max_ips; i++) {
-            final float val = val_dur[cnt_val++];
+            final float val = value[cnt_val++];
             ips[i].removeTween(false);
             ips[i].setImmediate(val);
         }
@@ -100,13 +91,12 @@ public final class Animation
     /** start the animation sequence if it is active */
     public final void stop()
     {
-        TweenManager.remove(this);
-        
+        TweenManager.remove(this);        
     }
     
     /* package */ boolean service(long dt)
     {
-        curr_time += dt / 1000f;
+        curr_time += dt;
         
         while(cnt_kf < max_kf && curr_time >= next_time)
             do_one_kf();                   
@@ -118,23 +108,26 @@ public final class Animation
     // execute one key frame
     private void do_one_kf()
     {
-        int cnt = kf_member_count[cnt_kf_count++];
-        
+        int cnt = data[cnt_data++];
+                        
         while(cnt-- > 0) {
-            final float val = val_dur[cnt_val++];
-            final float time = val_dur[cnt_val++];
-            TweenEquation eq = eqs[cnt_eqs++]; 
-            final int index = kf_member_count[cnt_kf_count++];
-            final ItemProperty ip = ips[index];
+            final int mem = data[cnt_data++];
+            final int dur = data[cnt_data++];            
+            final float val = value[cnt_val++];
+            final TweenEquation eq = eqs[cnt_eqs++];             
+            final ItemProperty ip = ips[mem];
+            
+            
             ip.set(val);
-            ip.setDuration(time);
+            ip.setDuration(dur / 1000.0f);
             ip.setEquation(eq);
+            
         }    
         
         // advance key frame
         cnt_kf++;        
         if(cnt_kf < max_kf)
-            next_time = kf_start_time[cnt_kf];                
+            next_time = data[cnt_data++];
     }
 }
 
