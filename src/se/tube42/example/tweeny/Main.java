@@ -13,8 +13,10 @@ import se.tube42.lib.tweeny.*;
 public class Main extends Frame
 {
     private static final Random rnd = new Random();
+    
     private final TweenEquation [] eqs = {
         TweenEquation.LINEAR,
+        TweenEquation.DELAYED,
         TweenEquation.DISCRETE,        
         TweenEquation.QUAD_IN,
         TweenEquation.QUAD_OUT,
@@ -24,9 +26,12 @@ public class Main extends Frame
         TweenEquation.SIN_OUT,        
         TweenEquation.BACK_IN,
         TweenEquation.BACK_OUT,
+        TweenEquation.TUBE42_1,
+        TweenEquation.TUBE42_2,        
         TweenEquation.ELASTIC_IN,
         TweenEquation.ELASTIC_OUT
     };
+    private Checkbox slowdown;
     
     public Main()
     {
@@ -39,8 +44,12 @@ public class Main extends Frame
         
         // Frame stuff
         setVisible(true);
-        setSize(400, 600);        
+        setSize(540, 800);        
         addWindowListener(wc);
+        
+        Panel p = new Panel();
+        add(p, BorderLayout.NORTH);
+        p.add(slowdown = new Checkbox("Slow down", false));
         
         // create two items
         final ExampleItem [] items = new ExampleItem[ eqs.length];
@@ -87,14 +96,19 @@ public class Main extends Frame
             public void run() {
                 try {        
                     boolean working = true, forward = false;
-                    for(;;) {
+                    for(int speed = 0; ; ) {
                         long t_old = System.currentTimeMillis();
                         do {
                             Thread.sleep(1000 / 100); // this is not really 100fps, the time is not that accurate ...
                             long t_now = System.currentTimeMillis();
-                            working = TweenManager.service(t_now - t_old);
-                            
+                            long dt = t_now - t_old;
                             t_old = t_now;
+                            
+                            if(slowdown.getState())
+                                dt = Math.max(1, dt / 5);
+                            
+                            working = TweenManager.service(dt);
+                            
                             c.repaint();
                             
                         } while(working);
@@ -108,7 +122,9 @@ public class Main extends Frame
                         
                         // change the speed
                         if(!forward) {
-                            final float t = 0.1f + 0.3f * (rnd.nextInt() & 0x3);
+                            // final float t = 0.1f + 0.3f * (rnd.nextInt() & 0x3);
+                            final float t = 0.5f + speed * 0.5f;
+                            speed = (speed + 1) & 7;
                             setTitle("[Tweeny test] time=" + t);
                             
                             for(int i = 0; i < items.length; i++)                         

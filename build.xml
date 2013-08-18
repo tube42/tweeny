@@ -12,7 +12,7 @@
   </target>
   
   <target name="dist" depends="compile" >
-    <jar jarfile="Tweeny.jar" basedir="${build}" includes="se/tube42/lib/**" />
+    <jar jarfile="Tweeny_lib.jar" basedir="${build}" includes="se/tube42/lib/**" />
   </target>
   
   <target name="example" depends="compile" >
@@ -45,6 +45,6 @@
   <target name="clean"  description="clean up" >
     <delete dir="${build}"/>
     <delete dir="docs"/>    
-    <delete file="Tweeny.jar" />
+    <delete file="Tweeny_lib.jar" />
   </target>
 </project>

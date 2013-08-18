@@ -15,6 +15,20 @@ package se.tube42.lib.tweeny;
     }
 }
 
+/* package */ final class DelayedEquation implements TweenEquation 
+{
+    public String toString() { return "Delayed"; }
+    
+    public final float compute(float t)
+    {        
+        if(t < 0.25) return t * 2;
+        if(t > 0.75) return t*2 - 1;
+        return 0.5f;        
+    }
+}
+
+
+
 /* package */ final class DiscreteEquation implements TweenEquation 
 {
     public String toString() { return "Discrete"; }
@@ -135,11 +149,37 @@ package se.tube42.lib.tweeny;
     }
 }
 
+/* package */ final class Tube42OneEquation implements TweenEquation 
+{
+    public String toString() { return "Tube42-1"; }
+    
+    public final float compute(final float t)
+    {        
+        final float t2 = t * t;
+        final float t4 = t2 * t2;
+        // return 2 * t2 * t2 * t - t2;        
+        return (2 * t2 * t - 1) * t2;
+    }
+}
+
+/* package */ final class Tube42TwoEquation implements TweenEquation 
+{
+    public String toString() { return "Tube42-2"; }
+    
+    public final float compute(final float t)
+    {        
+        final float t2 = t * t;
+        final float t4 = t2 * t2;
+        return 2 * t4 * t4 - t2 * t;
+    }
+}
+
 
 public interface TweenEquation 
 {
     public static final TweenEquation 
           LINEAR = new LinearEquation(),
+          DELAYED = new DelayedEquation(),
           DISCRETE = new DiscreteEquation(),
           QUAD_IN = new QuadInEquation(),
           QUAD_OUT = new QuadOutEquation(),
@@ -149,6 +189,8 @@ public interface TweenEquation
           ELASTIC_OUT = new ElasticOutEquation(),
           BACK_IN = new BackInEquation(),
           BACK_OUT = new BackOutEquation(),
+          TUBE42_1 = new Tube42OneEquation(),
+          TUBE42_2 = new Tube42TwoEquation(),
           SIN_IN = new SinInEquation(),
           SIN_OUT = new SinOutEquation()          
           ;
