@@ -40,7 +40,7 @@
       <arg line="add Tweeny_lib.jar"/>
     </exec>        
     <exec executable="git" dir="${site}">
-      <arg line="commit Tweeny_lib.jar -m 'Updated tweeny dist'"/>
+      <arg line="commit Tweeny_lib.jar -m 'published tweeny from build.xml'"/>
     </exec>        
     <exec executable="git" dir="${site}">
       <arg line="push"/>
