@@ -10,6 +10,15 @@ package se.tube42.lib.tweeny;
 
 public class Item
 {
+    
+    /** bit fields for flags */
+    public static final int          
+          FLAGS_STARTED = 1,
+          FLAGS_CHANGED = 2,
+          FLAGS_ENDED = 3
+          ;
+    
+    
     /* package */ ItemProperty [] properties;
 
     /**
@@ -74,4 +83,25 @@ public class Item
     {
         properties[index].set(v0, v1);          
     }        
+    
+    
+    /** get variable flags */        
+    public final int getFlags(int index)
+    {
+        return properties[index].flags;
+    }
+    
+    /** set variable flags */        
+    public final void setFlags(int index, int flags)
+    {
+        properties[index].flags = flags;
+    }            
+    
+    /** check and clear flags */        
+    public final int clearFlags(int index, int mask)
+    {
+        int ret = (properties[index].flags & mask);
+        properties[index].flags &= ~mask;        
+        return ret;
+    }                
 }

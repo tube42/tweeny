@@ -6,11 +6,6 @@ package se.tube42.lib.tweeny;
  */
 /* package */ final class ItemProperty
 {
-    /** bitfield for flags */
-    public static final int
-          FLAGS_CHANGED = 1
-          ;
-    
     /* package */ float v0, v1, vd, vc;
     /* package */ float duration, duration_inv;
     /* package */ float time_start;

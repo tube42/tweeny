@@ -78,11 +78,13 @@ public final class TweenManager
         ip.vc = ip.v0;
         
         if(ip.active) return;
-                
+        
         if(items_cnt >=  items.length)
             grow_items();
         
         ip.active = true;
+        ip.flags |= Item.FLAGS_STARTED;
+        
         items[items_cnt++] = ip;  
     }
     
@@ -130,10 +132,11 @@ public final class TweenManager
             if(ip.active) {
                 // final float dt = (time - ip.time_start) / 1000f;
                 final float dt = time_f - ip.time_start;
-                ip.flags |= ItemProperty.FLAGS_CHANGED;
+                ip.flags |= Item.FLAGS_CHANGED;
                 if(dt >= ip.duration) {
                     ip.vc = ip.v0 + ip.vd;
                     ip.active = false;
+                    ip.flags |= Item.FLAGS_ENDED;                    
                 } else {
                     w0++;
                     ip.vc = ip.v0 + ip.vd * ip.equation.compute(ip.duration_inv * dt);
