@@ -34,7 +34,8 @@ public final class AnimationBuilder
     private static final int MAX_PROPS = 128;
     
     private int prop_cnt;
-    private ItemProperty [] prop_obj;
+    private Item [] prop_owner;
+    private int [] prop_index;
     private float [] prop_time;
     private float [] prop_start;    
     private ArrayList<AnimationAction> actions;
@@ -52,7 +53,9 @@ public final class AnimationBuilder
     public void reset()
     {
         prop_cnt = 0;
-        prop_obj = new ItemProperty[MAX_PROPS];        
+        
+        prop_owner = new Item[MAX_PROPS];
+        prop_index = new int[MAX_PROPS];
         actions.clear();
     }
     
@@ -60,16 +63,15 @@ public final class AnimationBuilder
     public int addProperty(Item owner, int index, float start_value)
     {
         if(prop_cnt >= MAX_PROPS) return -1;
-        
-        ItemProperty ip = owner.properties[index];                
-        
+                
         // see if we already have this one:
         for(int i = 0; i < prop_cnt; i++)
-            if(prop_obj[i] == ip)
+            if(prop_owner[i] == owner && prop_index[i] == index)
                 return i;
                
         // add new one
-        prop_obj[prop_cnt] = ip;
+        prop_owner[prop_cnt] = owner;
+        prop_index[prop_cnt] = index;
         prop_time[prop_cnt] = 0;
         prop_start[prop_cnt] = start_value;
         return prop_cnt++;
@@ -149,7 +151,7 @@ public final class AnimationBuilder
         }
         
         // warning: unreadable & crazy code to follow
-        Animation anim = new Animation(prop_obj, 
+        Animation anim = new Animation(prop_owner, prop_index,
                   prop_cnt, 
                   frames + 1, 
                   actions.size());

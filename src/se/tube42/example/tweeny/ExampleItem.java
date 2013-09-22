@@ -28,14 +28,22 @@ public class ExampleItem extends Item
     public Color c;
     private String eq_name;
     
+    private float duration;
+    private TweenEquation eq;
+          
     public ExampleItem()
     {
         super(2);
         
         eq_name = "?";
         c = new Color( rnd.nextInt() & 0xFF, rnd.nextInt() & 0xFF, rnd.nextInt() & 0xFF);
+        
+        setPositionDuration(1f);
+        setPositionEquation(TweenEquation.LINEAR); 
+        
         setImmediate(ITEM_X, 0);
         setImmediate(ITEM_Y, 0);
+        
     }
     
     public void draw(Graphics g)
@@ -61,8 +69,8 @@ public class ExampleItem extends Item
     // helper functions for position tweening with Item
     public void setPosition(float x, float y)
     {
-        set(ITEM_X, x);
-        set(ITEM_Y, y);
+        set(ITEM_X, x).configure(duration, eq);
+        set(ITEM_Y, y).configure(duration, eq);
     }
     
     public float getX() { return get(ITEM_X); }
@@ -71,14 +79,12 @@ public class ExampleItem extends Item
     
     public void setPositionDuration(float t)
     {
-        setDuration(ITEM_X, t);
-        setDuration(ITEM_Y, t);
+        this.duration = t;
     }
     
     public void setPositionEquation(TweenEquation eq)
     {
-        setEquation(ITEM_X, eq);
-        setEquation(ITEM_Y, eq);
+        this.eq = eq;
         eq_name = eq.toString();
     }        
 }

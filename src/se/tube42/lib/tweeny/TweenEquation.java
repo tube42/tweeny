@@ -60,6 +60,24 @@ package se.tube42.lib.tweeny;
     }
 }
 
+/* package */ final class QuadInOutEquation implements TweenEquation 
+{
+    public String toString() { return "Quad-inout"; }
+    
+    public final float compute(float t)
+    {
+        // I don't like in-out equations, this one is more of a tribute to Martin...
+        // https://twitter.com/grapefrukt/status/380579943748739072
+        
+        final float t1 = t * 2;        
+        if(t1 < 1) 
+            return t1 * t1 * 0.5f;
+        else {
+            return -0.5f * ((t1-1) * (t1-3) - 1);
+        }            
+    }
+}
+
 /* package */ final class CubeInEquation implements TweenEquation 
 {
     public String toString() { return "Cube-in"; }
@@ -183,6 +201,7 @@ public interface TweenEquation
           DISCRETE = new DiscreteEquation(),
           QUAD_IN = new QuadInEquation(),
           QUAD_OUT = new QuadOutEquation(),
+          QUAD_INOUT = new QuadInOutEquation(),
           CUBE_IN = new CubeInEquation(),
           CUBE_OUT = new CubeOutEquation(),          
           ELASTIC_IN = new ElasticInEquation(),

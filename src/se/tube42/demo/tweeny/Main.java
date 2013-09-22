@@ -26,11 +26,7 @@ public class Main extends Frame implements Runnable, MouseListener
         this.items[0] = new BoxItem(Color.RED, 210, 210);
         this.items[1] = new BoxItem(Color.BLUE, 20, 20);
         this.items[2] = new BoxItem(Color.GREEN, 400, 20);
-        
-        
-        items[0].setEquation(BoxItem.ITEM_X, TweenEquation.QUAD_OUT);
-        items[0].setEquation(BoxItem.ITEM_Y, TweenEquation.QUAD_OUT);
-        
+                        
         AnimationBuilder ab = new AnimationBuilder();
         int id1 = ab.addProperty(items[0], BoxItem.ITEM_SW, 1f);
         int id2 = ab.addProperty(items[0], BoxItem.ITEM_SH, 1f);

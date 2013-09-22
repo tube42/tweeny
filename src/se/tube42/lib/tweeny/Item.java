@@ -10,17 +10,10 @@ package se.tube42.lib.tweeny;
 
 public class Item
 {
-    
-    /** bit fields for flags */
-    public static final int          
-          FLAGS_STARTED = 1,
-          FLAGS_CHANGED = 2,
-          FLAGS_ENDED = 3
-          ;
-    
-    
+        
     /* package */ ItemProperty [] properties;
-
+    /* package */ float [] data;
+    
     /**
      * create an item with the given number of variables
      */    
@@ -28,10 +21,10 @@ public class Item
     {
         if(fields > 0) {
             properties = new ItemProperty[fields];
-            for(int i = 0; i < properties.length; i++) 
-                properties[i] = new ItemProperty();
+            data = new float[fields];
         } else {
             properties = null;
+            data = null;
         }
     }
     
@@ -40,68 +33,39 @@ public class Item
     /** is this variable currently tweened? */
     public final boolean isTweenActive(int index)
     {
-        return properties[index].active;
+        return properties[index] != null;
     }
     
     /** stop tweening this variable */
     public final void removeTween(int index, boolean finish)
     {
-        properties[index].removeTween(finish);
-    }
-    
-    /** set tweening equation for this variable */
-    public final void setEquation(int index, TweenEquation eq)
-    {
-        properties[index].setEquation(eq); 
-    }
-    /** set tweening duration for this variable */
-    public final void setDuration(int index, float time)
-    {
-        properties[index].setDuration(time);                
+        final ItemProperty ip = properties[index];
+        if(ip != null)            
+            TweenManager.removeTween(ip, finish);
     }
     
     /** get current value of a variable */    
     public final float get(int index)
     {
-        return properties[index].get();
+        return data[index];
     }
     
     /** set current value of a variable */        
     public final void setImmediate(int index, float value)
-    {
-        properties[index].setImmediate(value);        
+    {        
+        removeTween(index, false);        
+        data[index] = value;        
     }
     
     /** set future value of a variable */        
-    public final void set(int index, float value)
-    {
-        properties[index].set(value);                
+    public final ItemProperty set(int index, float value)
+    {             
+        return set(index, data[index], value);
     }
     
     /** tween value of a variable from v0 to v1 */        
-    public final void set(int index, float v0, float v1)
+    public final ItemProperty set(int index, float v0, float v1)
     {
-        properties[index].set(v0, v1);          
-    }        
-    
-    
-    /** get variable flags */        
-    public final int getFlags(int index)
-    {
-        return properties[index].flags;
-    }
-    
-    /** set variable flags */        
-    public final void setFlags(int index, int flags)
-    {
-        properties[index].flags = flags;
-    }            
-    
-    /** check and clear flags */        
-    public final int clearFlags(int index, int mask)
-    {
-        int ret = (properties[index].flags & mask);
-        properties[index].flags &= ~mask;        
-        return ret;
+        return TweenManager.addTween(this, index, v0, v1);
     }                
 }

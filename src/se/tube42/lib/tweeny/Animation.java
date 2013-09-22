@@ -13,7 +13,8 @@ public final class Animation
     // that we wanted to avoid allocating too many small object hence
     // everything is packed into a few large arrays
     
-    /* package */ ItemProperty [] ips;
+    /* package */ Item [] items;
+    /* package */ int [] indices;
     /* package */ int [] data;        // |time0|count0|mem0|dur0|mem1|dur1|...|time1|count1|
     /* package */ float [] value;       // |init0|init1|... |val0|val1|..
     /* package */ TweenEquation [] eqs;  // |eq0|eq1|...
@@ -24,9 +25,10 @@ public final class Animation
     private int cnt_data, cnt_val, cnt_eqs, cnt_kf;
     private int curr_time, next_time;
     
-    /* package */ Animation(ItemProperty [] ips, int ips_count, int kf_count, int val_count)
+    /* package */ Animation(Item [] items, int [] indices, int ips_count, int kf_count, int val_count)
     {
-        this.ips = ips;
+        this.items = items;
+        this.indices = indices;
         this.max_ips = ips_count;
         this.max_kf = kf_count;
         this.data = new int[kf_count * 2 + val_count * 2];
@@ -43,9 +45,13 @@ public final class Animation
      */
     public Animation(Animation clone)
     {
-        this.ips = new ItemProperty[clone.max_ips];
-        for(int i = 0; i < this.ips.length; i++)
-            this.ips[i] = clone.ips[i];
+        this.items = new Item[clone.max_ips];
+        this.indices = new int[clone.max_ips];
+        
+        for(int i = 0; i < this.items.length; i++) {
+            this.items[i] = clone.items[i];
+            this.indices[i] = clone.indices[i];
+        }
                 
         this.max_ips = clone.max_ips;
         this.max_kf = clone.max_kf;
@@ -64,7 +70,9 @@ public final class Animation
     public void replaceProperty(int current_id, Item new_item, int new_index)
     {
         if(current_id < 0 || current_id >= max_ips) return;
-        ips[current_id] = new_item.properties[new_index];
+        
+        items[current_id] = new_item;
+        indices[current_id] = new_index;
     }
               
     // reset animation, called by TweenManger after start()
@@ -77,8 +85,7 @@ public final class Animation
         // stop current tweens and set initial values
         for(int i = 0; i < max_ips; i++) {
             final float val = value[cnt_val++];
-            ips[i].removeTween(false);
-            ips[i].setImmediate(val);
+            items[i].setImmediate(indices[i], val);
         }
     }
     
@@ -115,14 +122,8 @@ public final class Animation
             final int dur = data[cnt_data++];            
             final float val = value[cnt_val++];
             final TweenEquation eq = eqs[cnt_eqs++];             
-            final ItemProperty ip = ips[mem];
-            
-            
-            ip.set(val);
-            ip.setDuration(dur / 1000.0f);
-            ip.setEquation(eq);
-            
-        }    
+            items[ mem].set( indices[mem], val).configure(dur / 1000.0f, eq);            
+        } 
         
         // advance key frame
         cnt_kf++;        

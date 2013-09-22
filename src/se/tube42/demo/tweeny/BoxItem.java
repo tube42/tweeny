@@ -21,7 +21,7 @@ public class BoxItem extends Item
     // these are not tweened
     public int w, h;
     public Color c;
-    
+        
     public BoxItem(Color c, int x, int y)
     {
         super(4);
@@ -34,11 +34,6 @@ public class BoxItem extends Item
         setImmediate(ITEM_Y, y);
         setImmediate(ITEM_SW, 1);
         setImmediate(ITEM_SH, 1);
-        
-        setDuration(ITEM_X, 0.3f);
-        setDuration(ITEM_Y, 0.3f);                
-        setEquation(ITEM_X, TweenEquation.BACK_OUT);
-        setEquation(ITEM_Y, TweenEquation.BACK_OUT);
     }
     
     public void draw(Graphics g)
@@ -74,20 +69,8 @@ public class BoxItem extends Item
     // helper functions for position tweening with Item
     public void setPosition(float x, float y)
     {
-        set(ITEM_X, x);
-        set(ITEM_Y, y);
-    }
-    
-    public void setScale(float s)
-    {
-        set(ITEM_SW, s);
-        set(ITEM_SH, s);
-    }
-    
-    public void setScale(float sw, float sh)
-    {
-        set(ITEM_SW, sw);
-        set(ITEM_SH, sh);
+        set(ITEM_X, x).configure(0.3f, TweenEquation.BACK_OUT);
+        set(ITEM_Y, y).configure(0.3f, TweenEquation.BACK_OUT);
     }
     
     public float getX() { return get(ITEM_X); }

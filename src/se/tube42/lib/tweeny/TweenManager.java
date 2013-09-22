@@ -1,6 +1,10 @@
 
 package se.tube42.lib.tweeny;
 
+import java.util.*;
+import java.lang.reflect.Array;
+
+
 /**
  * Tween manager, handles the frame movement. 
  */
@@ -12,32 +16,47 @@ public final class TweenManager
     // To avoid further problems, we also reset then when no tweens or animations are queued
     private static long time_l = 0;    
     private static float time_f = 0;
-    private static int items_cnt = 0;    
+    private static int items_cnt = 0;
+    private static int items_pool_cnt = 0;
     private static ItemProperty [] items = new ItemProperty[64];
-    
+    private static ItemProperty [] items_pool = new ItemProperty[64];
     private static int animations_cnt = 0;
-    private static Animation [] animations = new Animation[16];
-       
+    private static Animation [] animations = new Animation[8];
+    
+    
+    // dummy item, not animated. see addTween for usage
+    private static ItemProperty ip_dummy = new ItemProperty();    
+    
+    
+    // ---------------------------------------------------------
+    // ItemProperty pool
+    private final static ItemProperty items_pool_get()
+    {
+        return (items_pool_cnt == 0) ? 
+             new ItemProperty() : items_pool[--items_pool_cnt];
+    }
+    
+    private final static void items_pool_put(ItemProperty ip)
+    {
+        if(items_pool_cnt == items_pool.length)
+            items_pool = Arrays.copyOf( items_pool, items_pool.length * 4);
+        
+        ip.reset();
+        items_pool[items_pool_cnt++] = ip;
+    }    
+    
+    
     // ---------------------------------------------------------
     // Animation stuff
-    
-    private static void grow_animations()
-    {
-        final int old_size = animations.length;
-        final int new_size = old_size * 2 + 2;
-        Animation [] new_animations = new Animation[new_size];
-        for(int i = 0; i < old_size; i++) 
-            new_animations[i] = animations[i];
-        animations = new_animations;
-    }    
     
     /* packate */ static final void add(Animation anim)
     {
         anim.reset();        
         if(anim.active) return; // already in queue
         
-        if(animations_cnt >=  animations.length)
-            grow_animations();
+        if(animations_cnt >= animations.length) {
+            animations = Arrays.copyOf( animations, animations.length * 4);
+        }
         
         anim.active = true;
         animations[animations_cnt++] = anim;
@@ -61,38 +80,40 @@ public final class TweenManager
     
     // ---------------------------------------------------------
     // ItemProperty stuff    
-    private static void grow_items()
+        
+    /* package */ static ItemProperty addTween(Item item, int index, 
+              float v0, float v1)
     {
-        final int old_size = items.length;
-        final int new_size = old_size * 2 + 2;
-        ItemProperty [] new_items = new ItemProperty[new_size];
-        for(int i = 0; i < old_size; i++) 
-            new_items[i] = items[i];
-        items = new_items;
-    }
-    
-    /* package */ static void add(ItemProperty ip)
-    {
-        // do this before active check!        
+        
+        // no movement at all? don't add it
+        if(v0 == v1) {
+            item.setImmediate(index, v1);            
+            return ip_dummy; // instead of NULL :(
+        }
+        
+        
+        // remove possible old tweens
+        ItemProperty ip = item.properties[index];
+        
+        if(ip == null) 
+            ip = item.properties[index] = items_pool_get();
+            
+        
+        ip.set(item, index, v0, v1);
         ip.time_start = time_f;
-        ip.vc = ip.v0;
+                
+        if(!ip.active) {
+            ip.active = true;
+            if(items_cnt >=  items.length) {
+                items = Arrays.copyOf( items, items.length * 4);
+            }
+            items[items_cnt++] = ip;  
+        }
         
-        if(ip.active) return;
-        
-        if(items_cnt >=  items.length)
-            grow_items();
-        
-        ip.active = true;
-        ip.flags |= Item.FLAGS_STARTED;
-        
-        items[items_cnt++] = ip;  
+        return ip;        
     }
     
    
-    /* package */ static void remove(ItemProperty ip)
-    {
-        ip.active = false;  // will be removed in the service loop
-    }
        
     /** 
      * remove all currently active tweens.
@@ -101,9 +122,25 @@ public final class TweenManager
     public static void removeTweens(boolean finish)
     {
         for(int i = 0; i < items_cnt; i++)
-            items[i].removeTween(finish);
+            removeTween(items[i], finish);
         items_cnt = 0;
     }
+    
+    public static void removeTween(ItemProperty ip, boolean finish)
+    {
+        ip.active = false;            
+        if(finish)
+            ip.item.data[ip.index] = ip.v1;                    
+    }
+    
+  
+    public static void removeTween(Item item, int index, boolean finish)
+    {
+        final ItemProperty ip = item.properties[index];
+        if(ip != null)
+            removeTween(ip, finish);
+    }
+        
     
     /**
      * service the tweens for this frame.
@@ -130,19 +167,22 @@ public final class TweenManager
             if(w0 != r0) items[w0] = ip;
             
             if(ip.active) {
-                // final float dt = (time - ip.time_start) / 1000f;
-                final float dt = time_f - ip.time_start;
-                ip.flags |= Item.FLAGS_CHANGED;
+                float dt = time_f - ip.time_start;
                 if(dt >= ip.duration) {
-                    ip.vc = ip.v0 + ip.vd;
                     ip.active = false;
-                    ip.flags |= Item.FLAGS_ENDED;                    
-                } else {
-                    w0++;
-                    ip.vc = ip.v0 + ip.vd * ip.equation.compute(ip.duration_inv * dt);
-                }                   
+                    dt = ip.duration;
+                }
+                
+                ip.update(ip.duration_inv * dt);
+                
             }
+            
+            if(!ip.active)
+                items_pool_put(ip);            
+            else
+                w0++;
         }
+        
         items_cnt = w0;        
         active |= items_cnt != 0;
         

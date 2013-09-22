@@ -20,6 +20,7 @@ public class Main extends Frame
         TweenEquation.DISCRETE,        
         TweenEquation.QUAD_IN,
         TweenEquation.QUAD_OUT,
+        TweenEquation.QUAD_INOUT,
         TweenEquation.CUBE_IN,
         TweenEquation.CUBE_OUT,
         TweenEquation.SIN_IN,
@@ -90,7 +91,6 @@ public class Main extends Frame
         System.out.println("FYI: starting the initial animation");
         anim.start();            
         
-        
         // the worker thread will update the world time and request the canvas to draw the items
         new Thread() {
             public void run() {
@@ -109,13 +109,12 @@ public class Main extends Frame
                             
                             working = TweenManager.service(dt);
                             
-                            c.repaint();
-                            
+                            c.repaint();                          
                         } while(working);
                         
                         // nothing to tween? move some stuff                        
                         forward = !forward;                        
-                        int x = forward ? 132 : c.getWidth() - 80 - 32;
+                        int x = forward ? c.getWidth() - 80 - 32 : 132;
                         for(int i = 0; i < items.length; i++) {
                             items[i].setPosition(x, 12 + i * 40);                
                         }
