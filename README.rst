@@ -11,7 +11,7 @@ If we change these variables, we will see the sprite to move immediately:
 .. image:: http://tube42.github.io/tweeny/notween.gif
 
 This might be exactly what you want. But the sudden jump from point 1 to point 2 could also be extremly boring...
-Something it is much nicer to the eye to **animate** these values from current value to goal value during a number of frames
+Something it is much nicer to the eye to **animate** this movement from current value to goal value during a number of frames
 
 .. image:: http://tube42.github.io/tweeny/tween.gif
 
@@ -39,7 +39,7 @@ For normal (boring) operations, access your variables using the methods *get()* 
  // get value of Y (variable 1) right now
  float y = sprite.get(1);
 
-But if you want to be one of the cool guys and use tween, you call *set()* instead:
+But if you want to be one of the cool guys and tween, you call *set()* instead:
 ::
  // set X to 350
  sprite.set(0, 350f);

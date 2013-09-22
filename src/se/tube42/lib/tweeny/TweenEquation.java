@@ -125,9 +125,11 @@ package se.tube42.lib.tweeny;
     
     public final float compute(float t)
     {
-        final float x1 = t * 0.5f * (float) Math.PI;
-        return (float) Math.sin(x1) + 
-              (1 - t) * (float) Math.sin( 5 * t * t * x1);
+        final float x0 = 1 - t;
+        final float x1 = x0 * 0.5f * (float) Math.PI;
+        final float p = (float) Math.sin(x1) + 
+              (1 - x0) * (float) Math.sin( 5 * x0 * x0 * x1);
+        return 1-p;        
     }
 }
 
@@ -136,12 +138,10 @@ package se.tube42.lib.tweeny;
     public String toString() { return "Elastic-out"; }
     
     public final float compute(float t)
-    {
-        final float x0 = 1 - t;
-        final float x1 = x0 * 0.5f * (float) Math.PI;
-        final float p = (float) Math.sin(x1) + 
-              (1 - x0) * (float) Math.sin( 5 * x0 * x0 * x1);
-        return 1-p;        
+    {        
+        final float x1 = t * 0.5f * (float) Math.PI;
+        return (float) Math.sin(x1) + 
+              (1 - t) * (float) Math.sin( 5 * t * t * x1);        
     }
 }
 
@@ -173,10 +173,10 @@ package se.tube42.lib.tweeny;
     
     public final float compute(final float t)
     {        
-        final float t2 = t * t;
+        final float t1 = 1 - t;
+        final float t2 = t1 * t1;
         final float t4 = t2 * t2;
-        // return 2 * t2 * t2 * t - t2;        
-        return (2 * t2 * t - 1) * t2;
+        return 1 - (2 * t2 * t1 - 1) * t2;
     }
 }
 
@@ -186,9 +186,10 @@ package se.tube42.lib.tweeny;
     
     public final float compute(final float t)
     {        
-        final float t2 = t * t;
+        final float t1 = 1 - t;
+        final float t2 = t1 * t1;
         final float t4 = t2 * t2;
-        return 2 * t4 * t4 - t2 * t;
+        return 1 - 2 * t4 * t4 + t2 * t1;
     }
 }
 
