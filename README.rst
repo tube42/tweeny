@@ -75,7 +75,7 @@ For such situation it is recommended that you use a pre-built animation sequence
  int id1 = ab.addProperty(sprite, 1, 0);
  ab.set(id1, TweenEquation.LINEAR, 100, 1, 0, 0.5f, 25, 3);
  
- // finally, we build the animation object from to be used in 
+ // finally, we build the animation object to be used in 
  // our game/program and save it for later use
  Animation anim = ab.build(null);
 
