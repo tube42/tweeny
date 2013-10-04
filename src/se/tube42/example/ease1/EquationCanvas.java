@@ -1,4 +1,4 @@
-package se.tube42.example.tweeny;
+package se.tube42.example.ease1;
 
 import java.awt.*;
 

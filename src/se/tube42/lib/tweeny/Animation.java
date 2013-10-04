@@ -19,8 +19,9 @@ public final class Animation
     /* package */ float [] value;       // |init0|init1|... |val0|val1|..
     /* package */ TweenEquation [] eqs;  // |eq0|eq1|...
     /* package */ boolean active;
-    /* package */ Runnable on_finish;     // run this when we are done
+    /* package */  Runnable on_finish;     // run this when we are done
     
+    private float [] delta;
     private int max_kf, max_ips;
     private int cnt_data, cnt_val, cnt_eqs, cnt_kf;
     private int curr_time, next_time;
@@ -35,20 +36,26 @@ public final class Animation
         this.value = new float[val_count + ips_count];
         this.eqs = new TweenEquation[val_count];
         this.active = false;
+        this.delta = new float[max_ips];
+        
+        deltaReset();
     }
     
+    // -----------------------------------------------------------------------
     /** 
      * Clone an existing animation.
-     * Use this instead of creating a new Animation using AnimationBuilder
+     * Use this instead of creating a new Animation using A3nimationBuilder
      * if all you want to do is to run an identical animation with
      * different properties
      */
     public Animation(Animation clone)
     {
+        this.delta = new float[clone.max_ips];        
         this.items = new Item[clone.max_ips];
         this.indices = new int[clone.max_ips];
         
         for(int i = 0; i < this.items.length; i++) {
+            this.delta[i] = clone.delta[i];
             this.items[i] = clone.items[i];
             this.indices[i] = clone.indices[i];
         }
@@ -59,8 +66,7 @@ public final class Animation
         this.data = clone.data;
         this.value = clone.value; 
         this.eqs = clone.eqs;
-        this.active = false;
-        
+        this.active = false;        
     }
     
     /**
@@ -85,7 +91,7 @@ public final class Animation
         // stop current tweens and set initial values
         for(int i = 0; i < max_ips; i++) {
             final float val = value[cnt_val++];
-            items[i].setImmediate(indices[i], val);
+            items[i].setImmediate(indices[i], val + delta[i]);
         }
     }
     
@@ -118,11 +124,12 @@ public final class Animation
         int cnt = data[cnt_data++];
                         
         while(cnt-- > 0) {
-            final int mem = data[cnt_data++];
-            final int dur = data[cnt_data++];            
-            final float val = value[cnt_val++];
+            final int mem = data[cnt_data++];  // which item
+            final int index = indices[mem];    // which property        
+            final int dur = data[cnt_data++];  // what duration?
+            final float val = value[cnt_val++] + delta[mem];
             final TweenEquation eq = eqs[cnt_eqs++];             
-            items[ mem].set( indices[mem], val).configure(dur / 1000.0f, eq);            
+            items[ mem].set( index, val).configure(dur / 1000.0f, eq);
         } 
         
         // advance key frame
@@ -130,5 +137,42 @@ public final class Animation
         if(cnt_kf < max_kf)
             next_time = data[cnt_data++];
     }
+    
+    // -----------------------------------------------------------------------
+    // Delta management
+    
+    /** remove all delta values */
+    public void deltaReset()
+    {
+        for(int i = 0; i < delta.length; i++)
+            delta[i] = 0;
+    }
+    
+    /** set delta for this item property to the given value */
+    public void deltaSet(Item item, int index, float value)
+    {
+        for(int i = 0; i < items.length; i++)
+            if(items[i] == item && indices[i] == index)
+                delta[i] = value;
+    }
+
+    /** set delta for all animated properties of this item to
+     * their current value
+     */
+    public void deltaSet(Item item)
+    {
+        for(int i = 0; i < items.length; i++)
+            if(items[i] == item)
+                delta[i] = items[i].data[ indices[i] ];
+    }
+    
+    /** set delta for all properties from their current value */
+    public void deltaSet()
+    {
+        for(int i = 0; i < items.length; i++)
+            delta[i] = items[i].data[ indices[i] ];
+    }
+    
+    
 }
 

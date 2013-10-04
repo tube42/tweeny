@@ -106,8 +106,9 @@ From the source tree, do this to build the API docs
 
 If you want to see some examples, take look at these directories
 :: 
- src/se/tube42/example/tweeny
- src/se/tube42/demo/tweeny
+ src/se/tube42/example/ease1
+ src/se/tube42/example/demo1
+ src/se/tube42/example/demo2
 
 Why?
 ~~~~

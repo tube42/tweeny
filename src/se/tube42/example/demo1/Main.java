@@ -1,24 +1,23 @@
-
-package se.tube42.demo.tweeny;
+package se.tube42.example.demo1;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
 import se.tube42.lib.tweeny.*;
+import se.tube42.example.common.*;
 
-/**
- * Twey demo
- */
-public class Main extends Frame implements Runnable, MouseListener
+/** Tweeny demo1 */
+public class Main 
+extends BaseWindow 
+implements MouseListener
 {
-    private DemoCanvas canvas;
     private BoxItem [] items;    
     private int state;
     
     private Animation press_anim0, press_anim1, press_anim2, stop_anim0;
-    private Checkbox animate, slowdown;
-    
+    private Checkbox cb_anim, cb_slow;
+        
     public Main()
     {                
         this.state = 0;
@@ -50,64 +49,44 @@ public class Main extends Frame implements Runnable, MouseListener
         id2 = ab.addProperty(items[0], BoxItem.ITEM_SH, 1f);
         ab.set(id2, TweenEquation.QUAD_IN, 0.95f, 0.05f, 1f, 0.2f);
         stop_anim0 = ab.build(null);
-        
-        
-        // this canvas will draw all items
-        add( canvas = new DemoCanvas(items), BorderLayout.CENTER);
-        canvas.addMouseListener(this);
+                
         
         Panel panel = new Panel();
         add(panel, BorderLayout.NORTH);
-        panel.add(animate = new Checkbox("Animate", true));
-        panel.add(slowdown = new Checkbox("Slow down", false));
+        panel.add(cb_anim = new Checkbox("Animate", true));
+        panel.add(cb_slow = new Checkbox("Slow down", false));
         
-        Thread t = new Thread(this);
-        t.start();
         
-        // Frame stuff        
-        final WindowAdapter wc = new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);
-            }
-        };
+        canvas.addMouseListener(this);
         
-        setVisible(true);
-        setSize(500, 600);
-        setLocation(10, 10);        
-        addWindowListener(wc);
-        
+        setSize(500, 600);        
+        start();        
     }
     
     
-    // probably not needed, but just in case
-    public void update(Graphics g) 
+    public void paintCanvas(Graphics g, int w, int h)
     {
-        paint(g);
+        // draw to back buffer: clear screen and draw each item
+        g.setColor(Color.GRAY);
+        g.fillRect(0, 0, w, h);
+        
+        // draw all items
+        for(int i = 0; i < items.length; i++)
+           items[i].draw(g);                
     }
     
-    // the worker thread will update the world time and request the canvas to draw the items
     
-    public void run() {
-        try {       
-            
-            long t_old = System.currentTimeMillis();            
-            for(;;) {                
-                Thread.sleep(1000 / 100); // this is not really 100fps, the time is not that accurate ...
-                long t_now = System.currentTimeMillis();
-                long dt = t_now - t_old;
-                t_old = t_now;
-                
-                if(!animate.getState()) dt = 10000;
-                else if(slowdown.getState()) dt = Math.max(1, dt / 2);
-                TweenManager.service( dt);
-                
-                canvas.repaint();
-            }
-        } catch(Exception error) {
-            System.out.println("ERROR " + error);
-            System.exit(0);
-        }
+    // ------------------------------------
+    
+    public boolean frame(long dt)
+    {
+        if(!cb_anim.getState()) dt = 10000;
+        else if(cb_slow.getState()) dt /= 4;
+        
+        return super.frame(dt);
     }
+    
+    // ----------------------------------
     
     public void mousePressed(MouseEvent e)
     { 

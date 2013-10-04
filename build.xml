@@ -20,20 +20,28 @@
   <target name="dist" depends="compile" >
     <jar jarfile="Tweeny_lib.jar" basedir="${build}" includes="se/tube42/lib/**" />
   </target>
-    
-  <target name="example" depends="compile" >
-    <java classname="se.tube42.example.tweeny.Main" fork="yes">
+  
+  <!-- demos and examples -->
+  <target name="ease1" depends="compile" >
+    <java classname="se.tube42.example.ease1.Main" fork="yes">
       <classpath path="${build}"/>      
     </java>
   </target>
   
   
-  <target name="demo" depends="compile" >
-    <java classname="se.tube42.demo.tweeny.Main" fork="yes">
+  <target name="demo1" depends="compile" >
+    <java classname="se.tube42.example.demo1.Main" fork="yes">
       <classpath path="${build}"/>      
     </java>
   </target>
   
+  <target name="demo2" depends="compile" >
+    <java classname="se.tube42.example.demo2.Main" fork="yes">
+      <classpath path="${build}"/>      
+    </java>
+  </target>
+  
+  <!-- misc -->
   <target name="doc" depends="compile" >
     <javadoc sourcepath="src" destdir="docs" packagenames="se.tube42.lib.*" />
   </target>
@@ -54,12 +62,13 @@
   
   <target name="help">
     <echo>
-      build   build the code
-      example runs the example code
-      demo    run the demo code
-      dist    create library jar file
-      doc     create API docs
-      clean   clean up
+      build     build the code
+      demo1     run the simple demo code
+      demo2     run the animation and delta demo
+      ease1     run the easeing example code      
+      dist      create library jar file
+      doc       create API docs
+      clean     clean up
       
       publish **INTERNAL USE ONLY: UPLOADS DIST TO GITHUB**
     </echo>

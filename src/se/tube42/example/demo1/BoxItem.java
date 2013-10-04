@@ -1,5 +1,4 @@
-
-package se.tube42.demo.tweeny;
+package se.tube42.example.demo1;
 
 import java.awt.*;
 import java.util.*;
