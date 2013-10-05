@@ -1,4 +1,0 @@
-TODO
-====
-
-Due to floating point issues, the time (local and global) is now stored in a long. However, ItemProperties and Animation are still using floats internally. While this is not an immediate problem (?) it should be fixed in future.
