@@ -10,7 +10,7 @@ import se.tube42.example.common.*;
 /** Tweeny demo1 */
 public class Main 
 extends BaseWindow 
-implements MouseListener
+implements MouseListener, MouseMotionListener
 {
     private PointItem point;
     
@@ -26,28 +26,29 @@ implements MouseListener
         AnimationBuilder ab = new AnimationBuilder();
         int idx = ab.addProperty(point, PointItem.ITEM_X, 0f);
         int idy = ab.addProperty(point, PointItem.ITEM_Y, 0f);
-        int ids = ab.addProperty(point, PointItem.ITEM_S, 1f);
+        int ids = ab.addProperty(point, PointItem.ITEM_S, 0f);
         
-        for(int i = 0; i < 5; i++) {
-            float t = 0.05f * (i + 1);
-            int a = 15 + 2 * (i + 1);            
+        for(int i = 0; i < 10; i++) {
+            float t = 0.02f * (i + 1);
+            int a = 5 + 5 * (i + 1);            
             ab.set(idx, TweenEquation.QUAD_IN, -a, t, -a, t, +a, t, +a, t);
             ab.set(idy, TweenEquation.QUAD_IN, -a, t, +a, t, +a, t, -a, t);
         }
-        
+                
         for(int i = 0; i < 10; i++)
-            ab.set(ids, TweenEquation.LINEAR, 0.5f, 0.1f, 1, 0.1f);
+            ab.set(ids, TweenEquation.LINEAR, -0.5f, 0.1f, 0, 0.1f, +0.5f, 0.1f, 0, 0.1f);        
         
-        // go to final values
-        ab.set(idx, TweenEquation.QUAD_IN, 0, 0.4f);
-        ab.set(idy, TweenEquation.QUAD_IN, 0, 0.4f);
-        ab.set(ids, TweenEquation.QUAD_IN, 1, 0.4f);
-                                      
+        // end at zero
+        ab.set(idx, TweenEquation.LINEAR, 0, 0.1f);
+        ab.set(idy, TweenEquation.LINEAR, 0, 0.1f);
+        ab.set(ids, TweenEquation.LINEAR, 0, 0.1f);
+                                                      
         press_anim = ab.build(null);
                 
         
         canvas.addMouseListener(this);
-        setSize(500, 600);        
+        canvas.addMouseMotionListener(this);
+        setSize(800, 400);        
         start();        
     }
     
@@ -62,45 +63,37 @@ implements MouseListener
         point.draw(g);
     }
     
+        // ----------------------------------
+
+    public void mouseDragged(MouseEvent e)
+    {
+        press_anim.deltaSet(point, PointItem.ITEM_X, e.getX() );
+        press_anim.deltaSet(point, PointItem.ITEM_Y, e.getY() );        
+    }
     
-    
+    public void mouseMoved(MouseEvent e)
+    {
+        press_anim.deltaSet(point, PointItem.ITEM_X, e.getX() );
+        press_anim.deltaSet(point, PointItem.ITEM_Y, e.getY() );                
+    }
     // ----------------------------------
     
     public void mousePressed(MouseEvent e)
-    { 
-        final int x = e.getX();
-        final int y = e.getY();
-        
-        // setImmediate(ITEM_X, x);
-        // setImmediate(ITEM_Y, y);
-        
-        /*
-        // option 1:
-        press_anim.deltaSet(point, PointItem.ITEM_X, x);        
-        press_anim.deltaSet(point, PointItem.ITEM_Y, y);        
-           press_anim.deltaSet(point, PointItem.ITEM_S, 0);        
-         * */
-        
-        // opetion 2:
-        point.setImmediate(PointItem.ITEM_X, x);
-        point.setImmediate(PointItem.ITEM_Y, y);
-        point.setImmediate(PointItem.ITEM_S, 0);
+    {         
+        point.setImmediate(PointItem.ITEM_X, e.getX() );
+        point.setImmediate(PointItem.ITEM_Y, e.getY() );
+        point.setImmediate(PointItem.ITEM_S, 1);
         press_anim.deltaSet(point);
         
         press_anim.start();
     }
     
-    public void mouseReleased(MouseEvent e) 
-    { 
-    }
-    
-    
+    public void mouseReleased(MouseEvent e) {  }        
     public void mouseClicked(MouseEvent e) { }    
     public void mouseEntered(MouseEvent e) { }
     public void mouseExited(MouseEvent e) { }
-
     
-    // ----------------------------------
+    // -------------------------------------------
     
     public static void main(String []args)
     {
