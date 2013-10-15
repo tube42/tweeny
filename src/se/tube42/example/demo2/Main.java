@@ -7,7 +7,7 @@ import java.util.*;
 import se.tube42.lib.tweeny.*;
 import se.tube42.example.common.*;
 
-/** Tweeny demo1 */
+/** Tweeny demo 2 */
 public class Main 
 extends BaseWindow 
 implements MouseListener, MouseMotionListener

@@ -10,8 +10,20 @@ import java.util.*;
     public float value;
     public int start_time;
     public int duration;
+    public int pointer;
     public TweenEquation eq;
+    
+    public AnimationAction(int index, float value, int start_time, int duration, TweenEquation eq)
+    {
+        this.index = index;
+        this.value = value;
+        this.start_time = start_time;
+        this.duration = duration;
+        this.eq = eq;
+        this.pointer = -1;
+    }
 }
+
 
 
 /**
@@ -37,14 +49,12 @@ public final class AnimationBuilder
     private Item [] prop_owner;
     private int [] prop_index;
     private float [] prop_time;
-    private float [] prop_start;    
     private ArrayList<AnimationAction> actions;
     
       
     public AnimationBuilder()
     {
         prop_time = new float[MAX_PROPS];
-        prop_start = new float[MAX_PROPS];
         actions = new ArrayList<AnimationAction>();        
         reset();
     }
@@ -73,7 +83,10 @@ public final class AnimationBuilder
         prop_owner[prop_cnt] = owner;
         prop_index[prop_cnt] = index;
         prop_time[prop_cnt] = 0;
-        prop_start[prop_cnt] = start_value;
+        
+        AnimationAction aa = new AnimationAction(prop_cnt, start_value, -1, -1, null);
+        actions.add(aa);
+        
         return prop_cnt++;
     }
     
@@ -85,15 +98,16 @@ public final class AnimationBuilder
         if(id < 0 || id >= prop_cnt) return; // invalid id
         
         for(int i = 0; i < val_dur.length; i += 2) {
-            AnimationAction aa = new AnimationAction();
             final float value = val_dur[i + 0];
             final float duration = val_dur[i + 1];
-            aa.index = id;
-            aa.duration   = Math.max(1, (int)(0.5f + 1000f * duration));
-            aa.start_time = (int)(0.5 + 1000f * prop_time[id]);
-            aa.value = value;
-            aa.eq = eq;
-                        
+            
+            
+            AnimationAction aa = new AnimationAction(id, value,
+                      /* start time */ (int)(0.5 + 1000f * prop_time[id]),
+                      /* duration */ Math.max(1, (int)(0.5f + 1000f * duration)),
+                      eq
+                      );
+                                    
             prop_time[id] += duration;
             actions.add(aa);
         }
@@ -134,6 +148,39 @@ public final class AnimationBuilder
     }
     
     
+    // ----------------------------------------------------------------------------------
+    
+    /** 
+     * get a marker to the last set() operation, which can be used to change 
+     * it's value at some later point
+     */
+    public Object getMarker()
+    {
+        final int size = actions.size() - 1;
+        return size < 0 ? null : actions.get(size);
+    }
+    
+    /**
+     * change the value of the variable pointed to by the marker in this animation. 
+     * Note that you must ensure the Animation and marker really are related.
+     * @returns false if failed
+     */
+    public static boolean changeValueAtMarker(Animation animation, Object marker, float value)
+    {
+        try {            
+            AnimationAction aa = (AnimationAction) marker;            
+            if(aa.pointer >= 0 && aa.pointer < animation.value.length) {
+                animation.value[aa.pointer] = value;
+                return true;
+            }
+        } catch(Exception exx) { 
+            // ignored
+        }
+        
+        return false; // failed
+    }
+    // ----------------------------------------------------------------------------------
+    
     /** create the animation object */
     public Animation build(Runnable on_finish)
     {
@@ -154,17 +201,28 @@ public final class AnimationBuilder
         Animation anim = new Animation(prop_owner, prop_index,
                   prop_cnt, 
                   frames + 1, 
-                  actions.size());
-        int cnt_data = 0, cnt_val = 0, index_count = 0, cnt_eqs = 0;
-        last_start = -1;
+                  actions.size());                
         
         // insert the initial values in a key-frame
-        for(int i = 0; i < prop_cnt; i++)
-            anim.value[cnt_val++] = prop_start[i];        
+        for(int i = 0; i < prop_cnt; i++) {
+            AnimationAction aa = actions.get(i);
+            aa.pointer = aa.index;
+            anim.value[ aa.index] = aa.value;
+        }    
+        
+        
+        final int size = actions.size();        
+        int cnt_data = 0, index_count = 0, cnt_eqs = 0;
+        int cnt_val = prop_cnt; // start right after the initial values from above
+        last_start = -1;        
+        
         
         // insert the rest
         int last_end = (int)(0.5f + 1000 * getTime());
-        for(AnimationAction aa : actions) {
+        for(int i = prop_cnt; i < size; i++) {
+            AnimationAction aa = actions.get(i);
+            
+            // tweened value
             last_end = Math.max(last_end, aa.start_time + aa.duration);
             
             if(aa.start_time != last_start) {
@@ -177,9 +235,10 @@ public final class AnimationBuilder
             anim.data[cnt_data++] = aa.index; 
             anim.data[cnt_data++] = aa.duration;
             
+            aa.pointer = cnt_val;  /* save position of value !*/
             anim.value[cnt_val++] = aa.value;
             anim.eqs[cnt_eqs++] = aa.eq;
-        }
+        }        
         
         // final frame has no movements, it is just there so we
         // can detect the end and call on_finish
