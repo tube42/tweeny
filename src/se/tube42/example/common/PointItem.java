@@ -1,4 +1,4 @@
-package se.tube42.example.demo2;
+package se.tube42.example.common;
 
 import java.awt.*;
 import java.util.*;
@@ -17,8 +17,7 @@ public class PointItem extends Item
           ITEM_Y = 1,
           ITEM_S = 2
           ;
-    
-    
+        
     // ---------------------------------------------
     
     // these are not tweened

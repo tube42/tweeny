@@ -7,8 +7,6 @@ import java.util.*;
 import se.tube42.lib.tweeny.*;
 import se.tube42.example.common.*;
 
-import se.tube42.example.demo2.PointItem;
-
 /** Tweeny demo 3 */
 public class Main 
 extends BaseWindow 

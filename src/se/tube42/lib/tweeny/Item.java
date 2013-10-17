@@ -26,8 +26,7 @@ public class Item
             properties = null;
             data = null;
         }
-    }
-    
+    }    
     
     // ------------------------------------------------------
     /** is this variable currently tweened? */
@@ -58,13 +57,13 @@ public class Item
     }
     
     /** set future value of a variable */        
-    public final ItemProperty set(int index, float value)
+    public final TweenNode set(int index, float value)
     {             
         return set(index, data[index], value);
     }
     
     /** tween value of a variable from v0 to v1 */        
-    public final ItemProperty set(int index, float v0, float v1)
+    public final TweenNode set(int index, float v0, float v1)
     {
         return TweenManager.addTween(this, index, v0, v1);
     }                

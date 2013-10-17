@@ -1,4 +1,4 @@
-package se.tube42.example.demo1;
+package se.tube42.example.common;
 
 import java.awt.*;
 import java.util.*;

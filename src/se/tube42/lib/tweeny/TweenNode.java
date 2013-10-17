@@ -1,0 +1,127 @@
+
+package se.tube42.lib.tweeny;
+
+/**
+ * this class represents the first node in a list of tweens
+ */
+
+/* package */ final class ItemProperty extends TweenNode
+{
+    public boolean active;
+    public float v0, vd, time_start, duration_inv;
+    
+    public Item item;
+    public int index;
+    
+    public final void reset()
+    {           
+        if(item != null && item.properties[index] == this) {
+            item.properties[index] = null;            
+        }
+        this.active = false;
+        this.item = null;
+        
+        removeTails();
+        super.reset();                
+    }
+    
+    public final void set(Item item, int index, float v0, float v1)
+    {
+        this.item = item;
+        this.index = index;
+        
+        this.v0 = v0;
+        set(v1);        
+    }
+    
+    public final void set(float v1)
+    {
+        this.v1 = v1;
+        this.vd = v1 - v0;        
+    }
+    
+    public final void update(float d)
+    {
+        final float d2 = equation.compute(d);
+        item.data[index] = v0 + vd * d2;
+    }
+    
+    public final TweenNode configure(float duration, TweenEquation equation)
+    {
+        super.configure(duration, equation);
+        this.duration_inv = 1f / this.duration;        
+        return this;
+    }
+    
+    // ----------------------------------------------------
+    public void removeTails()
+    {
+        for(TweenNode t = this; t.tail != null; t = t.tail)
+            TweenManager.nodes_pool_put(t.tail);
+        
+        this.tail = null;
+    }
+    
+    public boolean processTail()
+    {
+        if(tail == null)
+            return false;
+        
+        final TweenNode tmp = tail;
+        this.tail = tmp.tail;
+        
+        // install this tail as the current target
+        this.v0 = this.v1;
+        set(tmp.v1);
+        configure(tmp.duration, tmp.equation);
+        
+        TweenManager.nodes_pool_put(tmp);
+        return true;
+    }
+}
+
+/**
+ * This represents a key, i.e. tween target point
+ */
+
+public class TweenNode
+{
+    /* package */ float v1;
+    /* package */ float duration;
+    protected TweenEquation equation;
+    protected TweenNode tail;
+        
+    public TweenNode()
+    {
+        reset();
+    }
+    
+    /** set the equation if not null */
+    public TweenNode configure(float duration, TweenEquation equation)
+    {
+        this.duration = Math.max(0.0001f, duration);
+        this.equation = equation;
+        return this;
+    }
+    
+    /** add a tail to this tween */
+    public final TweenNode tail(float value)
+    {
+        
+        // already have one?
+        if(tail != null)
+            return tail;
+        
+        TweenNode tmp = TweenManager.nodes_pool_get();
+        tmp.v1 = value;
+        this.tail = tmp;
+        
+        return tmp;
+    }
+    // -------------------------------------
+    /* package */ void reset()
+    {   
+        configure(1f, TweenEquation.LINEAR);
+        this.tail = null;        
+    }
+}

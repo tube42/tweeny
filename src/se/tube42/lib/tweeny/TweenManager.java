@@ -1,4 +1,5 @@
 
+
 package se.tube42.lib.tweeny;
 
 import java.util.*;
@@ -18,14 +19,35 @@ public final class TweenManager
     private static float time_f = 0;
     private static int items_cnt = 0;
     private static int items_pool_cnt = 0;
+    private static int nodes_pool_cnt = 0;
     private static ItemProperty [] items = new ItemProperty[64];
     private static ItemProperty [] items_pool = new ItemProperty[64];
+    private static TweenNode [] nodes_pool = new TweenNode[64];
+    
     private static int animations_cnt = 0;
     private static Animation [] animations = new Animation[8];
     
     
     // dummy item, not animated. see addTween for usage
     private static ItemProperty ip_dummy = new ItemProperty();    
+    
+    
+    // ---------------------------------------------------------
+    // TweenNode pool
+    /* package */ final static TweenNode nodes_pool_get()
+    {
+        return (nodes_pool_cnt == 0) ? 
+             new TweenNode() : nodes_pool[--nodes_pool_cnt];
+    }
+    
+    /* package */ final static void nodes_pool_put(TweenNode tn)
+    {
+        if(nodes_pool_cnt == nodes_pool.length)
+            nodes_pool = Arrays.copyOf( nodes_pool, nodes_pool.length * 4);
+
+        tn.reset();
+        nodes_pool[nodes_pool_cnt++] = tn;
+    }    
     
     
     // ---------------------------------------------------------
@@ -97,6 +119,9 @@ public final class TweenManager
         
         if(ip == null) 
             ip = item.properties[index] = items_pool_get();
+        else
+            // ip.reset();
+            ip.removeTails();
             
         
         ip.set(item, index, v0, v1);
@@ -128,9 +153,10 @@ public final class TweenManager
     
     public static void removeTween(ItemProperty ip, boolean finish)
     {
-        ip.active = false;            
+        ip.removeTails();        
+        ip.active = false;
         if(finish)
-            ip.item.data[ip.index] = ip.v1;                    
+            ip.item.data[ip.index] = ip.v1;
     }
     
   
@@ -168,15 +194,21 @@ public final class TweenManager
             
             if(ip.active) {
                 float dt = time_f - ip.time_start;
+                boolean ended = false;
                 if(dt >= ip.duration) {
-                    ip.active = false;
                     dt = ip.duration;
+                    ended = true;
                 }
                 
-                ip.update(ip.duration_inv * dt);
+                ip.update(ip.duration_inv * dt);                
                 
+                if(ended) {
+                    if(!ip.processTail())
+                        ip.active = false; // really ended
+                    else
+                        ip.time_start = time_f; // tails exist, started a new node
+                }                    
             }
-            
             if(!ip.active)
                 items_pool_put(ip);            
             else

@@ -47,6 +47,12 @@
     </java>
   </target>
   
+  <target name="demo4" depends="compile" >
+    <java classname="se.tube42.example.demo4.Main" fork="yes">
+      <classpath path="${build}"/>      
+    </java>
+  </target>
+  
   <!-- misc -->
   <target name="doc" depends="compile" >
     <javadoc sourcepath="src" destdir="docs" packagenames="se.tube42.lib.*" />
@@ -72,6 +78,7 @@
       demo1     run the simple demo code
       demo2     run the animation and delta demo
       demo3     run the dynamic animation demo
+      demo4     run the tween-tailing demo
       ease1     run the easeing example code      
       dist      create library jar file
       doc       create API docs

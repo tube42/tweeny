@@ -51,8 +51,28 @@ If you want to change that, call *configure()* immediately after set.
  // ( the tweening equations are explained at http://easings.net )
  sprite.set(0, 3.5f).configure(2f, TweenEquation.QUAD_IN);
 
+If you to immediately start another tweening when the current one has finished, you should use tail.
+For example, consider we want to tween a variable 0 from 10 to 20 in 1 second then tween it back to 10 in half a sec:
+::
+ // set variable 0 to 3.5, two seconds in future, use a quadratic interpolation.
+ // ( the tweening equations are explained at http://easings.net )
+ sprite.set(0, 10f, 20f).configure(1f, TweenEquation.LINEAR)
+    .tail(10f).configure(0.5f, TweenEquation.LINEAR);
 
-That's basically all there is to it. The only other thing you need to remember is to call the *TweenManager.service(long dt)* in your game loop (the dt parameter is the frame time in milliseconds). 
+You can basically repeat this as long as you want, but for more complex tweenings you should consider using the Animation class instead (see below)
+
+
+That's basically all there is to it. The only other thing you need to remember is to call the *TweenManager.service()* in your game loop. 
+::
+ // the game loop
+ while(true) {
+   long dt = frametime_in_ms();
+
+   process_input();
+   update_game_objects(dt);   
+   TweenManager.service(dt)  // <-- this is all you need to ad
+   render();
+  }
 
 Animations
 ~~~~~~~~~~
@@ -87,6 +107,11 @@ To play the animation, at any time you just do
 If your animation is already running, it will simply restart.
 
 
+Advanced topics
+~~~~~~~~~~~~~~~
+Animation deltas and markers are not covered here. Take a look at demo2 and demo3 to learn more.
+
+
 Where to get it?
 ----------------
 
@@ -106,9 +131,11 @@ From the source tree, do this to build the API docs
 
 If you want to see some examples, take look at these directories
 :: 
- src/se/tube42/example/ease1
- src/se/tube42/example/demo1
- src/se/tube42/example/demo2
+ src/se/tube42/example/ease1        - demonstrates the different ease equations
+ src/se/tube42/example/demo1        - simple demonstratation of tweening and animations
+ src/se/tube42/example/demo2        - demonstrates use of deltas to modify animations
+ src/se/tube42/example/demo3        - demonstrates use of markers to modify animations
+ src/se/tube42/example/demo4        - demonstrates use of tail() to creates chains of tweens
 
 Why?
 ~~~~
