@@ -12,49 +12,50 @@ public class Main
 extends BaseWindow 
 implements MouseListener
 {
-    private PointItem point1, point2;
+    private static final int POINTS = 6;
+    private PointItem point;
+    private int [] points;    
+    private int cnt;
+    
     private Animation anim;
     private Object [] marker;
-    private int [] points;
-    private int cnt;
     
     public Main()
     {                
         setTitle("Dynamic test");
         
         // marker and data for the dynamic part        
-        this.marker = new Object[8];
-        this.points = new int[8];
+        this.marker = new Object[POINTS*2];
+        this.points = new int[POINTS*2];
         this.cnt = 0;
         
         AnimationBuilder ab = new AnimationBuilder();
-        this.point1 = new PointItem(Color.RED, 100, 100);
-        this.point2 = new PointItem(Color.BLUE, 200, 100);
+        this.point = new PointItem(Color.RED, 100, 100);
         
-        int [] ids = new int[4];
         
-        // create start points        
-        for(int i = 0; i < 4; i++) {
-            ids[i] = ab.addProperty( i > 1 ? point2 : point1, 
-                      (i & 1) == 0 ? PointItem.ITEM_X : PointItem.ITEM_Y, 
-                      0f /* <- this will be replaced */ );
-            marker[i] = ab.getMarker();            
-        }
+        int idx = ab.addProperty( point, PointItem.ITEM_X, 0);
+        marker[0] = ab.getMarker();
         
-        // get the end points
-        for(int i = 0; i < 4; i++) {        
-            ab.set(ids[i], TweenEquation.BACK_IN, 0 /* <-- this will be replaced */, 1f);
-            marker[4 + i] = ab.getMarker();
+        int idy = ab.addProperty( point, PointItem.ITEM_Y, 0);
+        marker[1] = ab.getMarker();
+        
+        for(int i = 1; i < POINTS; i++) {
+            ab.set(idx, TweenEquation.BACK_IN, 0, 1f);
+            marker[i * 2 + 0] = ab.getMarker();
+            
+            ab.set(idy, TweenEquation.BACK_IN, 0, 1f);
+            marker[i * 2 + 1] = ab.getMarker();
         }
         
         // create animation
         anim = ab.build(null);
         
         // create initial values and update animation:
-        Random rnd = new Random();
-        for(int i = 0; i < points.length; i++)
-            points[i] = Math.abs( rnd.nextInt(300) );
-        update_points();
+        for(int i = 0; i < POINTS; i++) {
+            points[i * 2 + 0 ] = 64 + i * 128;
+            points[i * 2 + 1 ] = 74 + 128 * (i & 1);
+        }
+        update_points();            
         anim.start();  // first animation
             
         
@@ -66,29 +67,32 @@ implements MouseListener
     
     public void paintCanvas(Graphics g, int w, int h)
     {
-        // draw to back buffer: clear screen and draw each item
+        // clear screen
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, w, h);
         
         // draw help text
         g.setColor(Color.BLACK);
-        g.drawString("Right click to change each point", 20, 100);
-        g.drawString("Left click to start animation", 20, 140);
-
-        // draw end points
-        g.setColor(Color.black);
-        g.drawLine(points[0], points[1], points[4], points[5]);
-        g.drawLine(points[2], points[3], points[6], points[7]);
+        g.drawString("Left click to move the white point", 20, 100);
+        g.drawString("Right click to start animation", 20, 140);
         
-        for(int i = 0; i < points.length; i += 2) {
-            g.setColor(i == cnt ? Color.WHITE : Color.YELLOW);            
-            g.fillRect(points[i + 0] - 12, points[i + 1] - 12, 24, 24);   
-            g.setColor(Color.BLACK);
+        // draw the lines
+        int lx = 0, ly = 0;
+        g.setColor(Color.BLACK);        
+        for(int i = 0; i < POINTS; i++) {             
+            if(i != 0) g.drawLine(lx, ly, points[i*2], points[i*2+1]);            
+            lx = points[i*2];
+            ly = points[i*2+1];
+        }
+        
+        // draw the points
+        for(int i = 0; i < POINTS; i++) {
+            g.setColor(i == cnt ? Color.WHITE : Color.BLUE);                    
+            g.fillRect(points[i*2 + 0] - 12, points[i*2 + 1] - 12, 24, 24);           
         }
         
         // draw the items
-        point1.draw(g);
-        point2.draw(g);
+        point.draw(g);
     }
     
     
@@ -106,20 +110,16 @@ implements MouseListener
     
     public void mousePressed(MouseEvent e)
     {                 
-        if( e.getButton() == MouseEvent.BUTTON1) {
+        if( e.getButton() != MouseEvent.BUTTON1) {
             anim.start();
         } else {
-            points[cnt++] = e.getX();
-            points[cnt++] = e.getY();
-            if(cnt >= points.length) cnt = 0;
+            points[cnt * 2 + 0] = e.getX();
+            points[cnt * 2 + 1] = e.getY();
+            cnt++;
+            if(cnt >= POINTS) cnt = 0;
             update_points();
         }
     }
-    
-    public void mouseReleased(MouseEvent e) {  }        
-    public void mouseClicked(MouseEvent e) { }    
-    public void mouseEntered(MouseEvent e) { }
-    public void mouseExited(MouseEvent e) { }
     
     // -------------------------------------------
     

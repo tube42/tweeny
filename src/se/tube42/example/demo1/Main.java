@@ -10,7 +10,6 @@ import se.tube42.example.common.*;
 /** Tweeny demo1 */
 public class Main 
 extends BaseWindow 
-implements MouseListener
 {
     private BoxItem [] items;    
     private int state;
@@ -20,6 +19,7 @@ implements MouseListener
         
     public Main()
     {                
+        setTitle("Tween and animation demo");
         this.state = 0;
         this.items = new BoxItem[3];
         this.items[0] = new BoxItem(Color.RED, 210, 210);
@@ -66,13 +66,14 @@ implements MouseListener
     
     public void paintCanvas(Graphics g, int w, int h)
     {
-        // draw to back buffer: clear screen and draw each item
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, w, h);
-        
-        // draw all items
+                
         for(int i = 0; i < items.length; i++)
-           items[i].draw(g);                
+            items[i].draw(g);                
+        
+        g.setColor(Color.BLACK);
+        g.drawString("Touch any of the boxes!", 30, 70);    
     }
     
     
@@ -143,13 +144,7 @@ implements MouseListener
             items[0].setPosition(items[0].getX(), y1);
         }
     }
-    
-    
-    public void mouseClicked(MouseEvent e) { }    
-    public void mouseEntered(MouseEvent e) { }
-    public void mouseExited(MouseEvent e) { }
-
-    
+            
     public static void main(String []args)
     {
         new Main();

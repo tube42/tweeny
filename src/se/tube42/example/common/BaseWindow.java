@@ -6,9 +6,11 @@ import java.util.*;
 
 import se.tube42.lib.tweeny.*;
 
-public abstract class BaseWindow extends Frame implements Runnable
+public abstract class BaseWindow 
+extends Frame 
+implements Runnable, MouseListener, MouseMotionListener
 {    
-    private static final WindowAdapter wc = new WindowAdapter() {
+    protected static final WindowAdapter wc = new WindowAdapter() {
         public void windowClosing(WindowEvent e) {
             System.exit(0);
         }
@@ -69,5 +71,17 @@ public abstract class BaseWindow extends Frame implements Runnable
     {
         return TweenManager.service( dt);        
     }
+    
+    
+    // ---------------------------------------------
+    public void mousePressed(MouseEvent e) { }   
+    public void mouseReleased(MouseEvent e) { }    
+    public void mouseClicked(MouseEvent e) { }    
+    public void mouseEntered(MouseEvent e) { }
+    public void mouseExited(MouseEvent e) { }
+    
+    // ---------------------------------------------
+    public void mouseDragged(MouseEvent e) { }
+    public void mouseMoved(MouseEvent e) { }
 
 }

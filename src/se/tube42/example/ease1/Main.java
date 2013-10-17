@@ -37,12 +37,14 @@ public class Main extends BaseWindow
     private ExampleItem [] items;
     
     public Main()
-    {
+    {      
+        setTitle("Ease equations");
         
+        final int n = (int)Math.ceil(Math.sqrt( eqs.length));        
+
         // The graph window...
         Frame f = new Frame("The euqations...");
-        int n = (int)Math.ceil(Math.sqrt( eqs.length));
-        
+        f.addWindowListener(wc);        
         f.setVisible(true);
         f.setSize(84 * n, 84 * n);
         

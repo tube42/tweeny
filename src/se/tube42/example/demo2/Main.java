@@ -10,17 +10,15 @@ import se.tube42.example.common.*;
 /** Tweeny demo 2 */
 public class Main 
 extends BaseWindow 
-implements MouseListener, MouseMotionListener
 {
     private PointItem point;
     
     private Animation press_anim;
-        
+    
     public Main()
-    {                
+    {   
+        setTitle("Animation delta demo");
         this.point = new PointItem(Color.RED, -100, -100);
-        
-        setTitle("Touch anywhere in the screen to do an animation with delta");
         
         // create animation to play when clicked
         AnimationBuilder ab = new AnimationBuilder();
@@ -34,7 +32,7 @@ implements MouseListener, MouseMotionListener
             ab.set(idx, TweenEquation.QUAD_IN, -a, t, -a, t, +a, t, +a, t);
             ab.set(idy, TweenEquation.QUAD_IN, -a, t, +a, t, +a, t, -a, t);
         }
-                
+        
         for(int i = 0; i < 10; i++)
             ab.set(ids, TweenEquation.LINEAR, -0.5f, 0.1f, 0, 0.1f, +0.5f, 0.1f, 0, 0.1f);        
         
@@ -42,9 +40,9 @@ implements MouseListener, MouseMotionListener
         ab.set(idx, TweenEquation.LINEAR, 0, 0.1f);
         ab.set(idy, TweenEquation.LINEAR, 0, 0.1f);
         ab.set(ids, TweenEquation.LINEAR, 0, 0.1f);
-                                                      
+        
         press_anim = ab.build(null);
-                
+        
         
         canvas.addMouseListener(this);
         canvas.addMouseMotionListener(this);
@@ -55,16 +53,17 @@ implements MouseListener, MouseMotionListener
     
     public void paintCanvas(Graphics g, int w, int h)
     {
-        // draw to back buffer: clear screen and draw each item
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, w, h);
         
-        // draw all items
+        g.setColor(Color.BLACK);        
+        g.drawString("Touch anywhere in the screen and then move the pointer", 30, 70);
+        
         point.draw(g);
     }
     
-        // ----------------------------------
-
+    // ----------------------------------
+    
     public void mouseDragged(MouseEvent e)
     {
         press_anim.deltaSet(point, PointItem.ITEM_X, e.getX() );
@@ -87,11 +86,6 @@ implements MouseListener, MouseMotionListener
         
         press_anim.start();
     }
-    
-    public void mouseReleased(MouseEvent e) {  }        
-    public void mouseClicked(MouseEvent e) { }    
-    public void mouseEntered(MouseEvent e) { }
-    public void mouseExited(MouseEvent e) { }
     
     // -------------------------------------------
     

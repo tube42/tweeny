@@ -37,14 +37,14 @@ implements MouseListener
     
     public void paintCanvas(Graphics g, int w, int h)
     {
-        // draw to back buffer: clear screen and draw each item
+        // clear screen
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, w, h);
         
         // draw help text
         g.setColor(Color.BLACK);
         g.drawString("Left click to add one point", 30, 50);
-        g.drawString("Right click to add an animation", 30, 90);
+        g.drawString("Right click to start the tweening", 30, 90);
                 
         // draw the lines
         int lx = 0, ly = 0;
@@ -58,8 +58,7 @@ implements MouseListener
         // draw the points
         g.setColor(Color.BLUE);        
         for(int i = 0; i < cnt; i++)
-            g.fillRect(points[i*2 + 0] - 12, points[i*2 + 1] - 12, 24, 24);   
-        
+            g.fillRect(points[i*2 + 0] - 12, points[i*2 + 1] - 12, 24, 24);           
         
         // draw the items
         point.draw(g);
@@ -90,11 +89,6 @@ implements MouseListener
             if(cnt >= POINTS) cnt = 0;
         }
     }
-    
-    public void mouseReleased(MouseEvent e) {  }        
-    public void mouseClicked(MouseEvent e) { }    
-    public void mouseEntered(MouseEvent e) { }
-    public void mouseExited(MouseEvent e) { }
     
     // -------------------------------------------
     
