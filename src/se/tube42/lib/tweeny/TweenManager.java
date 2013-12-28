@@ -32,6 +32,8 @@ public final class TweenManager
     private static ItemProperty ip_dummy = new ItemProperty();    
     
     
+    private static boolean allow_empty = true;
+        
     // ---------------------------------------------------------
     // TweenNode pool
     /* package */ final static TweenNode nodes_pool_get()
@@ -100,6 +102,16 @@ public final class TweenManager
     }
     
     
+    /**
+     * When true, any tween or series of tweens that starts with 
+     * an empty movement is (source and destination are equal) is ignored
+     * @param allow allow empty tweens
+     */
+    public void allowEmptyTweens(boolean allow)
+    {
+        allow_empty = allow;
+    }
+    
     // ---------------------------------------------------------
     // ItemProperty stuff    
         
@@ -108,7 +120,7 @@ public final class TweenManager
     {
         
         // no movement at all? don't add it
-        if(v0 == v1) {
+        if(!allow_empty && v0 == v1) {
             item.setImmediate(index, v1);            
             return ip_dummy; // instead of NULL :(
         }
@@ -172,7 +184,7 @@ public final class TweenManager
      * service the tweens for this frame.
      * returns false when tween queue is empty
      * 
-     * delta_time is frame time in milliseconds
+     * @param delta_time is frame time in milliseconds
      */
     
     public static boolean service(long delta_time)

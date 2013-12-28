@@ -25,7 +25,7 @@ package se.tube42.lib.tweeny;
         super.reset();                
     }
     
-    public final void set(Item item, int index, float v0, float v1)
+    /* package */ final void set(Item item, int index, float v0, float v1)
     {
         this.item = item;
         this.index = index;
@@ -34,13 +34,14 @@ package se.tube42.lib.tweeny;
         set(v1);        
     }
     
-    public final void set(float v1)
+    /* package */ final void set(float v1)
     {
         this.v1 = v1;
         this.vd = v1 - v0;        
     }
     
-    public final void update(float d)
+    
+    /* package */ final void update(float d)
     {
         final float d2 = equation.compute(d);
         item.data[index] = v0 + vd * d2;
@@ -96,15 +97,23 @@ public class TweenNode
         reset();
     }
     
-    /** set the equation if not null */
+    /** 
+     * configure a tween with these parameters
+     * @param duration sets tween time
+     * @param equation sets tween equation if not null 
+     */
     public TweenNode configure(float duration, TweenEquation equation)
     {
         this.duration = Math.max(0.0001f, duration);
-        this.equation = equation;
+        if(equation != null) 
+            this.equation = equation;
         return this;
     }
     
-    /** add a tail to this tween */
+    /** 
+     * Add a tail to this tween with a new value point. To change other param, use configure()
+     * @param value the value to tween to
+     */
     public final TweenNode tail(float value)
     {
         

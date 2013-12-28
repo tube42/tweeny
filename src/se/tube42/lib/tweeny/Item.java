@@ -16,6 +16,7 @@ public class Item
     
     /**
      * create an item with the given number of variables
+     * @param fields number of properties in this item
      */    
     public Item(int fields) 
     {
@@ -29,13 +30,21 @@ public class Item
     }    
     
     // ------------------------------------------------------
-    /** is this variable currently tweened? */
+    /**
+     * is this property currently tweened? 
+     * @param index index of the property of interest
+     * @return true if currently tweened
+     */
     public final boolean isTweenActive(int index)
     {
         return properties[index] != null;
     }
     
-    /** stop tweening this variable */
+    /** 
+     * stop tweening this variable 
+     * @param index index of the property of interest
+     * @param finish property is set to its final value if this is true    
+     */
     public final void removeTween(int index, boolean finish)
     {
         final ItemProperty ip = properties[index];
@@ -43,26 +52,44 @@ public class Item
             TweenManager.removeTween(ip, finish);
     }
     
-    /** get current value of a variable */    
+    /** 
+     * get current value of a variable
+     * @param index index of the property of interest
+     */
     public final float get(int index)
     {
         return data[index];
     }
     
-    /** set current value of a variable */        
+    /** 
+     * set current value of a variable 
+     * @param index index of the property of interest     
+     * @param value value to set
+     */        
     public final void setImmediate(int index, float value)
     {        
         removeTween(index, false);        
         data[index] = value;        
     }
     
-    /** set future value of a variable */        
+    /** 
+     * set future value of a variable
+     * @param index index of the property of interest
+     * @param value final value
+     * @return the tween node
+     */
     public final TweenNode set(int index, float value)
     {             
         return set(index, data[index], value);
     }
     
-    /** tween value of a variable from v0 to v1 */        
+    /** 
+     * tween value of a variable from v0 to v1 
+     * @param index index of the property of interest
+     * @param v0 initial value
+     * @param v1 final value
+     * @return the tween node     
+     */ 
     public final TweenNode set(int index, float v0, float v1)
     {
         return TweenManager.addTween(this, index, v0, v1);

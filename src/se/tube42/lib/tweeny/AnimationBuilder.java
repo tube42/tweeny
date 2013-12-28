@@ -69,7 +69,13 @@ public final class AnimationBuilder
         actions.clear();
     }
     
-    /** add a property to the timeline. the start value is applied at time zero */
+    /** 
+     * add a property to the timeline. the start value is applied at time zero 
+     * @return property identifier 
+     * @param owner item this property belongs to
+     * @param index index of the property within the item
+     * @param start_value initial value 
+     */
     public int addProperty(Item owner, int index, float start_value)
     {
         if(prop_cnt >= MAX_PROPS) return -1;
@@ -114,14 +120,22 @@ public final class AnimationBuilder
     }
     
     
-    /** add pause to a timeline for the given duration */
+    /** 
+     * add pause to a timeline for the given duration 
+     * @param id property to pause
+     * @param duration pause amount
+     */
     public void pause(int id, float duration)
     { 
         if(id < 0 || id >= prop_cnt) return; // invalid id        
         prop_time[id] += duration;
     }
     
-    /** add pause to a timeline until this frame time is reached*/
+    /** 
+     * add pause to a timeline until this frame time is reached
+     * @param id property to pause
+     * @param time un-pause time    
+     */
     public void pauseUntil(int id, float time)
     {        
         if(id < 0 || id >= prop_cnt) return; // invalid id        
@@ -163,7 +177,10 @@ public final class AnimationBuilder
     /**
      * change the value of the variable pointed to by the marker in this animation. 
      * Note that you must ensure the Animation and marker really are related.
-     * @returns false if failed
+     * @return false if failed
+     * @param animation the animation
+     * @param marker the marker
+     * @param value the value to set
      */
     public static boolean changeValueAtMarker(Animation animation, Object marker, float value)
     {
@@ -181,7 +198,11 @@ public final class AnimationBuilder
     }
     // ----------------------------------------------------------------------------------
     
-    /** create the animation object */
+    /** 
+     * create the animation object 
+     * @return the created animation
+     * @param on_finish Runnable to execute when animation is finished (can be null)
+     */
     public Animation build(Runnable on_finish)
     {
         // sort everything with duration time

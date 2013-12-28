@@ -47,6 +47,7 @@ public final class Animation
      * Use this instead of creating a new Animation using A3nimationBuilder
      * if all you want to do is to run an identical animation with
      * different properties
+     * @param clone animation to clone
      */
     public Animation(Animation clone)
     {
@@ -72,6 +73,9 @@ public final class Animation
     /**
      * use this function to replace a property with a different one.
      * All animation timing, values etc. will remain as before
+     * @param current_id property ID to replace
+     * @param new_item item the new property belongs to
+     * @param new_index the property index within the item
      */
     public void replaceProperty(int current_id, Item new_item, int new_index)
     {
@@ -148,7 +152,12 @@ public final class Animation
             delta[i] = 0;
     }
     
-    /** set delta for this item property to the given value */
+    /** 
+     * set delta for this item property to the given value 
+     * @param item item the property belongs to
+     * @param index property index within the item
+     * @param value delta value 
+     */
     public void deltaSet(Item item, int index, float value)
     {
         for(int i = 0; i < items.length; i++)
@@ -156,8 +165,10 @@ public final class Animation
                 delta[i] = value;
     }
 
-    /** set delta for all animated properties of this item to
+    /** 
+     * set delta for all animated properties of this item to
      * their current value
+     * @param item set delta from properties in this item
      */
     public void deltaSet(Item item)
     {
@@ -171,8 +182,6 @@ public final class Animation
     {
         for(int i = 0; i < items.length; i++)
             delta[i] = items[i].data[ indices[i] ];
-    }
-    
-    
+    }        
 }
 

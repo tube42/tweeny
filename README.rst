@@ -18,16 +18,7 @@ Something it is much nicer to the eye to **animate** this movement from current 
 And this is exactly what Tweeny does for you...
 
 
-If you are still not convinced about usefulness of this, I suggest you watch `this video <http://www.youtube.com/watch?v=Fy0aCDmgnxg>`_ )
-
-
-Why another library?
---------------------
-
-Why yet another tweening library? Because I wanted to experiment with some animation techniques and couldn't get the existing ones to work to my liking.
-
-Tweeny may not be as efficient as some other libraries out there, but it is very compact and simple. And it's mine... all mine...
-
+If you are still not convinced about usefulness of this, I suggest you watch `this video <http://www.youtube.com/watch?v=Fy0aCDmgnxg>`_
 
 Where to get it?
 ----------------
