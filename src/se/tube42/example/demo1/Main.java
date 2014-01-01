@@ -15,7 +15,7 @@ extends BaseWindow
     private int state;
     
     private Animation press_anim0, press_anim1, press_anim2, stop_anim0;
-    private Checkbox cb_anim, cb_slow;
+    private Checkbox cb_anim, cb_slow, cb_empty;
         
     public Main()
     {                
@@ -55,6 +55,7 @@ extends BaseWindow
         add(panel, BorderLayout.NORTH);
         panel.add(cb_anim = new Checkbox("Animate", true));
         panel.add(cb_slow = new Checkbox("Slow down", false));
+        panel.add(cb_empty = new Checkbox("Allow empty tweens", true));
         
         
         canvas.addMouseListener(this);
@@ -73,7 +74,7 @@ extends BaseWindow
             items[i].draw(g);                
         
         g.setColor(Color.BLACK);
-        g.drawString("Touch any of the boxes!", 30, 70);    
+        g.drawString("Touch any of the boxes!", 30, 70);            
     }
     
     
@@ -81,6 +82,8 @@ extends BaseWindow
     
     public boolean frame(long dt)
     {
+        TweenManager.allowEmptyTweens(cb_empty.getState());
+        
         if(!cb_anim.getState()) dt = 10000;
         else if(cb_slow.getState()) dt /= 4;
         
@@ -107,7 +110,7 @@ extends BaseWindow
         if(items[0].hit(x, y)) {
             state = (state + 1) & 3;
             switch(state) {
-            case 0: 
+            case 0:                 
                 items[1].setPosition( 20 , 20); 
                 items[2].setPosition( 400, 20); 
                 break;

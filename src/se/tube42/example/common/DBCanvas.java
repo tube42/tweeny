@@ -2,6 +2,7 @@ package se.tube42.example.common;
 
 import java.awt.*;
 
+import se.tube42.lib.tweeny.*;
 
 /** double buffered canvas, for your flicker free enjoyment */
 public class DBCanvas extends Canvas
@@ -34,6 +35,19 @@ public class DBCanvas extends Canvas
             create_buffer(w_, h_);
         
         bw.paintCanvas(g, w_, h_);
+        
+        // ADD SOME STATS:
+        g.setColor(Color.BLACK);
+        g.drawString(
+                  "Active tweens/animations: " + 
+                  TweenManager.debugCountActiveTweens() + "/" +
+                  TweenManager.debugCountActiveAnimations() + 
+                  ", tweens/nodes in pool: " +
+                  TweenManager.debugCountPoolTweens() + "/" +
+                  TweenManager.debugCountPoolNodes(),                
+                  10, h_ - 10);
+        
+        
         g_.drawImage(image, 0, 0, w_, h_, 0, 0, w_, h_, this);
     }
     

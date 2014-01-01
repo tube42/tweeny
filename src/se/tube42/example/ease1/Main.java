@@ -33,7 +33,7 @@ public class Main extends BaseWindow
         TweenEquation.ELASTIC_OUT
     };
     
-    private Checkbox slowdown;
+    private Checkbox slowdown, allow_empty;
     private ExampleItem [] items;
     
     public Main()
@@ -57,10 +57,11 @@ public class Main extends BaseWindow
         this.toFront();
         
         // -------------------------------------
-        Panel p = new Panel();
+        Panel p = new Panel(new FlowLayout(FlowLayout.LEFT));
         add(p, BorderLayout.NORTH);
         p.add(slowdown = new Checkbox("Slow down", false));
-        
+        p.add(new Label("    "));
+        p.add( allow_empty = new Checkbox("Allow empty tweens", true));
         // create two items
         items = new ExampleItem[ eqs.length];
         for(int i = 0; i < items.length; i++) {
@@ -72,7 +73,8 @@ public class Main extends BaseWindow
         TweenManager.removeTweens(true); // commit all tweens
         
         // create a bunch of animation to show before we start
-        AnimationBuilder ab = new AnimationBuilder();   
+        AnimationBuilder ab = new AnimationBuilder();
+        
         for(int i = 0; i < items.length; i++) {
             final ExampleItem ei = items[i];
             final ExampleItem ei2 = items[ (i + 4) % items.length];
@@ -94,7 +96,7 @@ public class Main extends BaseWindow
         
         System.out.println("FYI: starting the initial animation");
         anim.start();            
-                
+        
         setSize(540, 800);        
         start();                
     }
@@ -102,14 +104,17 @@ public class Main extends BaseWindow
     private boolean forward = false;
     private int speed = 0;
     
+    int x = 0;
     public boolean frame(long dt)
     {
+        // allow empty tweens?
+        TweenManager.allowEmptyTweens(allow_empty.getState());
+        
         // possibly slow down and run a frame
         if(slowdown.getState())
             dt = Math.max(1, dt / 4);        
         boolean ret = super.frame(dt);
-        
-        
+                
         // nothing to tween? move some stuff            
         if(!ret) {
             forward = !forward;                        
@@ -126,7 +131,7 @@ public class Main extends BaseWindow
                 
                 for(int i = 0; i < items.length; i++)                         
                     items[i].setPositionDuration(t); 
-            }               
+            }
         }
         
         return ret;        

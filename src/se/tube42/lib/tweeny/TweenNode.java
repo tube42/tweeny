@@ -1,6 +1,8 @@
 
 package se.tube42.lib.tweeny;
 
+import java.util.*;
+
 /**
  * this class represents the first node in a list of tweens
  */
@@ -91,7 +93,7 @@ public class TweenNode
     /* package */ float duration;
     protected TweenEquation equation;
     protected TweenNode tail;
-        
+    
     public TweenNode()
     {
         reset();

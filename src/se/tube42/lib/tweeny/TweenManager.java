@@ -17,9 +17,12 @@ public final class TweenManager
     // To avoid further problems, we also reset then when no tweens or animations are queued
     private static long time_l = 0;    
     private static float time_f = 0;
-    private static int items_cnt = 0;
+    private static int items_cnt = 0;    
     private static int items_pool_cnt = 0;
+    private static int items_new_cnt = 0;    
     private static int nodes_pool_cnt = 0;
+    private static int nodes_new_cnt = 0;
+    
     private static ItemProperty [] items = new ItemProperty[64];
     private static ItemProperty [] items_pool = new ItemProperty[64];
     private static TweenNode [] nodes_pool = new TweenNode[64];
@@ -33,20 +36,23 @@ public final class TweenManager
     
     
     private static boolean allow_empty = true;
-        
+    
     // ---------------------------------------------------------
     // TweenNode pool
     /* package */ final static TweenNode nodes_pool_get()
     {
-        return (nodes_pool_cnt == 0) ? 
-             new TweenNode() : nodes_pool[--nodes_pool_cnt];
+        if(nodes_pool_cnt == 0) {
+            nodes_new_cnt++;
+            return new TweenNode();
+        } else
+            return nodes_pool[--nodes_pool_cnt];            
     }
     
     /* package */ final static void nodes_pool_put(TweenNode tn)
     {
         if(nodes_pool_cnt == nodes_pool.length)
             nodes_pool = Arrays.copyOf( nodes_pool, nodes_pool.length * 4);
-
+        
         tn.reset();
         nodes_pool[nodes_pool_cnt++] = tn;
     }    
@@ -55,9 +61,21 @@ public final class TweenManager
     // ---------------------------------------------------------
     // ItemProperty pool
     private final static ItemProperty items_pool_get()
-    {
-        return (items_pool_cnt == 0) ? 
-             new ItemProperty() : items_pool[--items_pool_cnt];
+    {       
+        ItemProperty ip = null;        
+        if(items_pool_cnt == 0) {
+            items_new_cnt++;
+            ip = new ItemProperty();
+        } else {
+            ip = items_pool[--items_pool_cnt];
+        }
+        
+        // add it to pool if active items:
+        if(items_cnt >=  items.length) 
+            items = Arrays.copyOf( items, items.length * 4);            
+        items[items_cnt++] = ip;              
+        
+        return ip;
     }
     
     private final static void items_pool_put(ItemProperty ip)
@@ -66,7 +84,7 @@ public final class TweenManager
             items_pool = Arrays.copyOf( items_pool, items_pool.length * 4);
         
         ip.reset();
-        items_pool[items_pool_cnt++] = ip;
+        items_pool[items_pool_cnt++] = ip;        
     }    
     
     
@@ -102,14 +120,71 @@ public final class TweenManager
     }
     
     
+    // ---------------------------------------------------------
+    // misc. functions
     /**
      * When true, any tween or series of tweens that starts with 
      * an empty movement is (source and destination are equal) is ignored
      * @param allow allow empty tweens
      */
-    public void allowEmptyTweens(boolean allow)
+    public static void allowEmptyTweens(boolean allow)
     {
         allow_empty = allow;
+    }
+    
+    
+    /**
+     * For debugging only!    
+     * @return the number of currently active tweens
+     */
+    public static int debugCountActiveTweens()
+    {
+        return items_cnt;
+    }
+    
+    /**
+     * For debugging only!
+     * @return the number of currently active animations
+     */
+    public static int debugCountActiveAnimations()
+    {
+        return animations_cnt;
+    }
+    
+    /**
+     * For debugging only!
+     * @return tweens in the pool
+     */
+    public static int debugCountPoolTweens()
+    {
+        return items_pool_cnt;
+    }
+    
+    /**
+     * For debugging only!    
+     * @return nodes in the pool
+     */
+    public static int debugCountPoolNodes()
+    {
+        return nodes_pool_cnt;
+    }
+    
+    /**
+     * For debugging only!
+     * @return tweens allocated in total
+     */
+    public static int debugCountAllocatedTweens()
+    {
+        return items_new_cnt;
+    }
+    
+    /**
+     * For debugging only!    
+     * @return nodes allocated in total
+     */
+    public static int debugCountAllocatedNodes()
+    {
+        return nodes_new_cnt;
     }
     
     // ---------------------------------------------------------
@@ -118,35 +193,26 @@ public final class TweenManager
     /* package */ static ItemProperty addTween(Item item, int index, 
               float v0, float v1)
     {
-        
+                
         // no movement at all? don't add it
         if(!allow_empty && v0 == v1) {
-            item.setImmediate(index, v1);            
+            item.setImmediate(index, v1);         
             return ip_dummy; // instead of NULL :(
         }
         
         
         // remove possible old tweens
         ItemProperty ip = item.properties[index];
-        
-        if(ip == null) 
-            ip = item.properties[index] = items_pool_get();
-        else
-            // ip.reset();
-            ip.removeTails();
-            
+                
+        if(ip == null) {
+            ip = item.properties[index] = items_pool_get();                        
+        } else {
+            ip.removeTails();  
+        }
         
         ip.set(item, index, v0, v1);
         ip.time_start = time_f;
-                
-        if(!ip.active) {
-            ip.active = true;
-            if(items_cnt >=  items.length) {
-                items = Arrays.copyOf( items, items.length * 4);
-            }
-            items[items_cnt++] = ip;  
-        }
-        
+        ip.active = true;                
         return ip;        
     }
     
@@ -160,10 +226,9 @@ public final class TweenManager
     {
         for(int i = 0; i < items_cnt; i++)
             removeTween(items[i], finish);
-        items_cnt = 0;
     }
     
-    public static void removeTween(ItemProperty ip, boolean finish)
+    /* package */ static void removeTween(ItemProperty ip, boolean finish)
     {
         ip.removeTails();        
         ip.active = false;
@@ -172,7 +237,7 @@ public final class TweenManager
     }
     
   
-    public static void removeTween(Item item, int index, boolean finish)
+    /* package */ static void removeTween(Item item, int index, boolean finish)
     {
         final ItemProperty ip = item.properties[index];
         if(ip != null)
@@ -183,8 +248,9 @@ public final class TweenManager
     /**
      * service the tweens for this frame.
      * returns false when tween queue is empty
-     * 
+     *      
      * @param delta_time is frame time in milliseconds
+     * @return false if there is nothing to do (i.e. no tweens / animation were active)
      */
     
     public static boolean service(long delta_time)
@@ -198,10 +264,9 @@ public final class TweenManager
         
         // service items
         final int items_len = items_cnt;        
-        int w0 = 0;                           
+        int w0 = 0;
         for(int r0 = 0; r0 < items_len; r0++) {
-            final ItemProperty ip = items[r0];
-            
+            final ItemProperty ip = items[r0];            
             if(w0 != r0) items[w0] = ip;
             
             if(ip.active) {
@@ -228,8 +293,7 @@ public final class TweenManager
         }
         
         items_cnt = w0;        
-        active |= items_cnt != 0;
-        
+        active |= items_cnt != 0;        
         
         // service animations:
         final int animations_len = animations_cnt;                
@@ -255,7 +319,7 @@ public final class TweenManager
             time_l = 0;
             time_f = 0;
         }
-        
+                
         return active;
     }
 }
