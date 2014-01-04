@@ -40,6 +40,33 @@ public class Item
         return properties[index] != null;
     }
     
+    /**
+     * is any property currently tweened? 
+     * @return true if anything is currently tweened
+     */
+    public final boolean isTweenActive()
+    {
+        for(final ItemProperty ip : properties) {
+            if(ip != null)
+                return true;
+        }
+        return false;
+    }
+    
+    /** 
+     * get tween time (assuimng ideal clock)
+     * @return total time required by this tween and its tails.
+     */    
+    public final float getTime()
+    {        
+        float ret = 0;
+        for(final ItemProperty ip : properties) {
+            if(ip != null)
+                ret = Math.max(ret, ip.getTime());
+        }
+        return ret;
+    }
+    
     /** 
      * stop tweening this variable 
      * @param index index of the property of interest
@@ -93,5 +120,5 @@ public class Item
     public final TweenNode set(int index, float v0, float v1)
     {
         return TweenManager.addTween(this, index, v0, v1);
-    }                
+    }
 }

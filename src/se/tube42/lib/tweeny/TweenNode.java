@@ -49,6 +49,22 @@ import java.util.*;
         item.data[index] = v0 + vd * d2;
     }
     
+    /** 
+     * get tween time (assuimng ideal clock)
+     * @return total time required by this tween and its tails.
+     */    
+    /* package */ final float getTime()
+    {
+        TweenNode tmp = this;        
+        float t = 0;
+        
+        while(tmp != null) {
+            t += tmp.duration;
+            tmp = tmp.tail;
+        }
+        return t;        
+    }
+    
     public final TweenNode configure(float duration, TweenEquation equation)
     {
         super.configure(duration, equation);
