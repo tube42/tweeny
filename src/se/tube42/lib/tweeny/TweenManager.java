@@ -280,6 +280,11 @@ public final class TweenManager
                 ip.update(ip.duration_inv * dt);                
                 
                 if(ended) {
+                    try {
+                        if(ip.on_end != null)
+                            ip.on_end.run();
+                    } catch(Exception ignored) { }
+                    
                     if(!ip.processTail())
                         ip.active = false; // really ended
                     else
@@ -292,7 +297,18 @@ public final class TweenManager
                 w0++;
         }
         
-        items_cnt = w0;        
+        // did we create new tweens while in the loop above?
+        // in that case include them in our list
+        if(items_cnt != items_len) {
+            active = true;
+            for(int r0 = items_len; r0 < items_cnt; r0++) {
+                if(w0 != r0) items[w0] = items[r0];
+                w0++;
+            }                
+        }
+        
+        
+        items_cnt = w0;
         active |= items_cnt != 0;        
         
         // service animations:

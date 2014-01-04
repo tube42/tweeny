@@ -63,6 +63,7 @@ implements Runnable, MouseListener, MouseMotionListener
             }
         } catch(Exception error) {
             System.out.println("ERROR " + error);
+            error.printStackTrace();
             System.exit(0);
         }
     }

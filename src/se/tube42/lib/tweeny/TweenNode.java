@@ -88,6 +88,7 @@ import java.util.*;
         
         final TweenNode tmp = tail;
         this.tail = tmp.tail;
+        this.on_end = tmp.on_end;
         
         // install this tail as the current target
         this.v0 = this.v1;
@@ -107,6 +108,7 @@ public class TweenNode
 {
     /* package */ float v1;
     /* package */ float duration;
+    /* package */ Runnable on_end;
     protected TweenEquation equation;
     protected TweenNode tail;
     
@@ -125,6 +127,12 @@ public class TweenNode
         this.duration = Math.max(0.0001f, duration);
         if(equation != null) 
             this.equation = equation;
+        return this;
+    }
+    
+    public TweenNode finish(Runnable r)
+    {
+        this.on_end = r;
         return this;
     }
     
@@ -150,5 +158,6 @@ public class TweenNode
     {   
         configure(1f, TweenEquation.LINEAR);
         this.tail = null;        
+        this.on_end = null;
     }
 }
