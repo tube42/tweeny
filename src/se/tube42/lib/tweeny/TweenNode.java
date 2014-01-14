@@ -141,8 +141,7 @@ public class TweenNode
      * @param value the value to tween to
      */
     public final TweenNode tail(float value)
-    {
-        
+    {        
         // already have one?
         if(tail != null)
             return tail;
@@ -153,6 +152,16 @@ public class TweenNode
         
         return tmp;
     }
+    
+    /** 
+     * Add a pause after this tween       
+     * @param time the pause time
+     */
+    public final TweenNode pause(float time)
+    {        
+        return tail(this.v1).configure(time, null);
+    }
+    
     // -------------------------------------
     /* package */ void reset()
     {   

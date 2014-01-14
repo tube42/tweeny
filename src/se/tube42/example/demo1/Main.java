@@ -14,7 +14,6 @@ extends BaseWindow
     private BoxItem [] items;    
     private int state;
     
-    private Animation press_anim0, press_anim1, press_anim2, stop_anim0;
     private Checkbox cb_anim, cb_slow, cb_empty;
         
     public Main()
@@ -25,46 +24,41 @@ extends BaseWindow
         this.items[0] = new BoxItem(Color.RED, 210, 210);
         this.items[1] = new BoxItem(Color.BLUE, 20, 20);
         this.items[2] = new BoxItem(Color.GREEN, 400, 20);
-                        
-        AnimationBuilder ab = new AnimationBuilder();
-        int id1 = ab.addProperty(items[0], BoxItem.ITEM_SW, 1f);
-        int id2 = ab.addProperty(items[0], BoxItem.ITEM_SH, 1f);
-        ab.set(id1, TweenEquation.QUAD_IN, 0.9f, 0.1f, 1.1f, 0.1f, 1f, 0.2f);        
-        ab.set(id2, TweenEquation.QUAD_IN, 0.9f, 0.1f, 1.1f, 0.1f, 1f, 0.2f);
-        press_anim0 = ab.build(null);
-        
-        // clone it and make it tween item1 instead
-        press_anim1 = new Animation( press_anim0);
-        press_anim1.replaceProperty(id1, items[1], BoxItem.ITEM_SW);
-        press_anim1.replaceProperty(id2, items[1], BoxItem.ITEM_SH);
-        
-        // same for #2
-        press_anim2 = new Animation( press_anim0);
-        press_anim2.replaceProperty(id1, items[2], BoxItem.ITEM_SW);
-        press_anim2.replaceProperty(id2, items[2], BoxItem.ITEM_SH);
-        
-        
-        // the stop animation
-        ab.reset();
-        id2 = ab.addProperty(items[0], BoxItem.ITEM_SH, 1f);
-        ab.set(id2, TweenEquation.QUAD_IN, 0.95f, 0.05f, 1f, 0.2f);
-        stop_anim0 = ab.build(null);
                 
-        
         Panel panel = new Panel();
         add(panel, BorderLayout.NORTH);
         panel.add(cb_anim = new Checkbox("Animate", true));
         panel.add(cb_slow = new Checkbox("Slow down", false));
         panel.add(cb_empty = new Checkbox("Allow empty tweens", true));
-        
-        
+                
         canvas.addMouseListener(this);
         
         setSize(500, 600);        
         start();        
     }
     
+    // ------------------------------------
+    // animators
     
+    private void anim_press(BoxItem bi)
+    {
+        bi.set(BoxItem.ITEM_SW, 1f, 0.9f).configure(0.1f, TweenEquation.QUAD_IN)
+              .tail(1.1f).configure(0.1f, TweenEquation.QUAD_IN)
+              .tail(1.0f).configure(0.2f, TweenEquation.QUAD_IN);
+        
+        bi.set(BoxItem.ITEM_SH, 1f, 0.9f).configure(0.1f, TweenEquation.QUAD_IN)
+              .tail(1.1f).configure(0.1f, TweenEquation.QUAD_IN)
+              .tail(1.0f).configure(0.2f, TweenEquation.QUAD_IN);
+    }
+    
+    private void anim_stop(BoxItem bi)
+    {
+        bi.set(BoxItem.ITEM_SH, 1f, 0.95f).configure(0.05f, TweenEquation.QUAD_IN)
+              .tail(1.0f).configure(0.2f, TweenEquation.QUAD_IN);
+    }
+    
+    // ------------------------------------
+        
     public void paintCanvas(Graphics g, int w, int h)
     {
         g.setColor(Color.GRAY);
@@ -78,7 +72,6 @@ extends BaseWindow
     }
     
     
-    // ------------------------------------
     
     public boolean frame(long dt)
     {
@@ -97,9 +90,12 @@ extends BaseWindow
         final int x = e.getX();
         final int y = e.getY();
         
-        if(items[0].hit(x, y)) press_anim0.start();        
-        else if(items[1].hit(x, y)) press_anim1.start();        
-        else if(items[2].hit(x, y)) press_anim2.start();        
+        for(int i = 0; i < 3; i++) {
+            if(items[i].hit(x, y)) {
+                anim_press(items[i]);
+                break;
+            }
+        }
     }
     
     public void mouseReleased(MouseEvent e) 
@@ -132,7 +128,7 @@ extends BaseWindow
         if(items[1].hit(x, y)) {            
             float y1 = items[0].getY() - 20;
             if(y1 < 20) {
-                stop_anim0.start();
+                anim_stop(items[0]);
                 y1= 20;
             }
             items[0].setPosition(items[0].getX(), y1);
@@ -141,7 +137,7 @@ extends BaseWindow
         if(items[2].hit(x, y)) {            
             float y1 = items[0].getY() + 20;
             if(y1 > 400) {
-                stop_anim0.start();
+                anim_stop(items[0]);
                 y1 = 400;
             }
             items[0].setPosition(items[0].getX(), y1);

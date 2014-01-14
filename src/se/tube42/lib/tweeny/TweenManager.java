@@ -14,7 +14,7 @@ public final class TweenManager
     // Optimally, we want time as a float so we don't need to do a FP division by 1000.0,
     // but as the float time grows, addition with small numbers will stop working.
     // Hence we track time with a long and convert it to a float.
-    // To avoid further problems, we also reset then when no tweens or animations are queued
+    // To avoid further problems, we also reset then when no tweens are queued
     private static long time_l = 0;    
     private static float time_f = 0;
     private static int items_cnt = 0;    
@@ -25,16 +25,11 @@ public final class TweenManager
     
     private static ItemProperty [] items = new ItemProperty[64];
     private static ItemProperty [] items_pool = new ItemProperty[64];
-    private static TweenNode [] nodes_pool = new TweenNode[64];
-    
-    private static int animations_cnt = 0;
-    private static Animation [] animations = new Animation[8];
-    
+    private static TweenNode [] nodes_pool = new TweenNode[64];        
     
     // dummy item, not animated. see addTween for usage
     private static ItemProperty ip_dummy = new ItemProperty();    
-    
-    
+        
     private static boolean allow_empty = true;
     
     // ---------------------------------------------------------
@@ -89,42 +84,13 @@ public final class TweenManager
     
     
     // ---------------------------------------------------------
-    // Animation stuff
-    
-    /* packate */ static final void add(Animation anim)
-    {
-        anim.reset();        
-        if(anim.active) return; // already in queue
-        
-        if(animations_cnt >= animations.length) {
-            animations = Arrays.copyOf( animations, animations.length * 4);
-        }
-        
-        anim.active = true;
-        animations[animations_cnt++] = anim;
-    }
-    
-    /* packate */ static final void remove(Animation anim)
-    {
-        anim.active = false;
-    }
-    
-    /** 
-     * remove all currently active animations.
-     */
-    public static void removeAnimations()
-    {
-        for(int i = 0; i < animations_cnt; i++)
-            animations[i].stop();
-        animations_cnt = 0;
-    }
-    
-    
-    // ---------------------------------------------------------
     // misc. functions
     /**
      * When true, any tween or series of tweens that starts with 
      * an empty movement is (source and destination are equal) is ignored
+     * <br>
+     * <b>Important note:<b> if you set this to false, all tweens 
+     * starting with a none-move or a pause will stop working!
      * @param allow allow empty tweens
      */
     public static void allowEmptyTweens(boolean allow)
@@ -141,16 +107,7 @@ public final class TweenManager
     {
         return items_cnt;
     }
-    
-    /**
-     * For debugging only!
-     * @return the number of currently active animations
-     */
-    public static int debugCountActiveAnimations()
-    {
-        return animations_cnt;
-    }
-    
+        
     /**
      * For debugging only!
      * @return tweens in the pool
@@ -189,11 +146,11 @@ public final class TweenManager
     
     // ---------------------------------------------------------
     // ItemProperty stuff    
-        
+    
     /* package */ static ItemProperty addTween(Item item, int index, 
               float v0, float v1)
     {
-                
+        
         // no movement at all? don't add it
         if(!allow_empty && v0 == v1) {
             item.setImmediate(index, v1);         
@@ -203,7 +160,7 @@ public final class TweenManager
         
         // remove possible old tweens
         ItemProperty ip = item.properties[index];
-                
+        
         if(ip == null) {
             ip = item.properties[index] = items_pool_get();                        
         } else {
@@ -216,8 +173,8 @@ public final class TweenManager
         return ip;        
     }
     
-   
-       
+    
+    
     /** 
      * remove all currently active tweens.
      * if finish is true it will finish the movement, otherwise just
@@ -236,27 +193,27 @@ public final class TweenManager
             ip.item.data[ip.index] = ip.v1;
     }
     
-  
+    
     /* package */ static void removeTween(Item item, int index, boolean finish)
     {
         final ItemProperty ip = item.properties[index];
         if(ip != null)
             removeTween(ip, finish);
     }
-        
+    
     
     /**
      * service the tweens for this frame.
      * returns false when tween queue is empty
      *      
      * @param delta_time is frame time in milliseconds
-     * @return false if there is nothing to do (i.e. no tweens / animation were active)
+     * @return false if there is nothing to do (i.e. no tweens were active)
      */
     
     public static boolean service(long delta_time)
     {        
         // this sanity check will help removing some error vectors later on
-        if(delta_time <= 0) return (items_cnt + animations_cnt) > 0;
+        if(delta_time <= 0) return items_cnt > 0;
         time_l += delta_time;        
         time_f = time_l / 1000f;
         
@@ -279,18 +236,30 @@ public final class TweenManager
                 
                 ip.update(ip.duration_inv * dt);                
                 
-                if(ended) {
-                    try {
-                        if(ip.on_end != null)
+                if(ended) {                    
+                    // see if there is a runable
+                    // we use the active flag to check if is has re-added itself in run()                    
+                    if(ip.on_end != null) {
+                        final boolean old_active = ip.active;                                        
+                        ip.active = false;                                                    
+                        try {
                             ip.on_end.run();
-                    } catch(Exception ignored) { }
-                    
+                        } catch(Exception ignored) { }
+                        if(ip.active) // self-modified, this tween is no longer dead!
+                            ended = false;
+                        else
+                            ip.active = old_active;
+                    }
+                }
+                
+                if(ended) {                        
                     if(!ip.processTail())
                         ip.active = false; // really ended
                     else
-                        ip.time_start = time_f; // tails exist, started a new node
-                }                    
+                        ip.time_start = time_f; // tails exist, started a new node                                        
+                }
             }
+            
             if(!ip.active)
                 items_pool_put(ip);            
             else
@@ -310,32 +279,13 @@ public final class TweenManager
         
         items_cnt = w0;
         active |= items_cnt != 0;        
-        
-        // service animations:
-        final int animations_len = animations_cnt;                
-        w0 = 0;                           
-        for(int r0 = 0; r0 < animations_len; r0++) {
-            final Animation an = animations[r0];            
-            if(w0 != r0) animations[w0] = an;
-            
-            if(an.active) {
-                active |= an.service(delta_time);
                 
-                if(!an.active && an.on_finish != null)
-                    an.on_finish.run();
-            }
-            if(an.active)
-                w0++;           
-        }
-        animations_cnt = w0;        
-        
-        
         // lets restart the counter, this will help us avoid FP problems
-        if(animations_cnt + items_cnt == 0) {
+        if(items_cnt == 0) {
             time_l = 0;
             time_f = 0;
         }
-                
+        
         return active;
     }
 }

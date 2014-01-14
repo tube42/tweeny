@@ -121,4 +121,32 @@ public class Item
     {
         return TweenManager.addTween(this, index, v0, v1);
     }
+    
+    /** 
+     * Start a tween chain with a pause. The tweened variable
+     * will keep its current value.
+     * @param index index of the property of interest
+     * @param time pause time
+     * @return the tween node     
+     */ 
+    public final TweenNode pause(int index, float time)
+    {
+        return pause(index, data[index], time);
+    }    
+    
+    /** 
+     * start a tween chain with a pause on this value
+     * 
+     * @param index index of the property of interest
+     * @param val use this value during the pause
+     * @param time pause time
+     * @return the tween node     
+     */ 
+    
+    public final TweenNode pause(int index, float val, float time)
+    {
+        return TweenManager.addTween(this, index, val, val)
+              .configure(time, null);
+    }    
+    
 }

@@ -39,9 +39,8 @@ public class DBCanvas extends Canvas
         // ADD SOME STATS:
         g.setColor(Color.BLACK);
         g.drawString(
-                  "Active tweens/animations: " + 
-                  TweenManager.debugCountActiveTweens() + "/" +
-                  TweenManager.debugCountActiveAnimations() + 
+                  "Active tweens: " + 
+                  TweenManager.debugCountActiveTweens() +
                   ", tweens/nodes in pool: " +
                   TweenManager.debugCountPoolTweens() + "/" +
                   TweenManager.debugCountPoolNodes(),                

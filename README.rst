@@ -88,38 +88,29 @@ As an example, assume we want to tween a variable 0 from 10 to 20 in 1 second th
  sprite.set(0, 10f, 20f).configure(1f, TweenEquation.LINEAR) // <-- first tween
     .tail(10f).configure(0.5f, TweenEquation.LINEAR);        // <-- second tween
 
-You can basically repeat this as long as you want, but for more complex tweenings you should consider using the Animation class instead (see below)
+You can basically repeat this as long as you want.
 
-Animations
-~~~~~~~~~~
-Sometimes we may have a complex set of movements that we want to perform in sequence. 
-Consider for example a case where we want to move our sprite from (0, 0) to (100, 100) during one second 
-and then back to (50, 50) half a second later and finally we will change the Y value to 25 after three additional seconds.
-
-Doing this using vanilla tweening can be a bit cumbersome.
-For such situation it is recommended that you use a pre-built animation sequence:
-::  
- // to build animations, you will need one of these classes 
- AnimationBuilder ab = new AnimationBuilder();
- 
- // movements of X: 0 -> 100 (1s) -> 50 (0.5s)
- int id0 = ab.addProperty(sprite, 0, 0); // last number is the initial value
- ab.set(id0, TweenEquation.LINEAR, 100, 1, 50, 0.5f);
-
- // movements of Y: 0 -> 100 (1s) -> 50 (0.5s) -> 25 (3s)
- int id1 = ab.addProperty(sprite, 1, 0);
- ab.set(id1, TweenEquation.LINEAR, 100, 1, 0, 0.5f, 25, 3);
- 
- // finally, we build the animation object to be used in 
- // our game/program and save it for later use
- Animation anim = ab.build(null);
-
-
-To play the animation, at any time you just do
+Pauses
+~~~~~~
+You can add a pause inside a chain. For example we can add a 2 second pause in the middle of the previous example
 ::
- anim.start();
+    // set variable 0 to 10 -> 20 (1s) -> (pause for 2s) -> 10 (1/2s)
+    sprite.set(0, 10f, 20f).configure(1f, TweenEquation.LINEAR) // <-- first tween
+        .pause(2f)                                               // <-- pause
+        .tail(10f).configure(0.5f, TweenEquation.LINEAR);        // <-- second tween
 
-If your animation is already running, it will simply restart.
+You can even start a tween with a pause:
+::
+ // set variable 0 to 10 -> (pause for 2s) -> 20 (1s)  -> 10 (1/2s)
+ sprite.pause(0, 10, 2f)                                     // <-- initial pause
+    .tail(20f).configure(1f, TweenEquation.LINEAR)           // <-- first tween
+    .tail(10f).configure(0.5f, TweenEquation.LINEAR);        // <-- second tween
+
+Pauses are as expensive as tweens, so don't use a tons of pauses if you dont really have to. 
+Also, pauses are empty tweens so if you do this they will stop to work
+::
+    TweenManager.allowEmptyTweens(false);
+    
 
 I need more information!
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,33 +120,17 @@ From the source tree, do this to build the API docs
 
 If you want to see some examples, take look at these directories
 :: 
- src/se/tube42/example/ease1        - demonstrates the different ease equations
- src/se/tube42/example/demo1        - demonstrates basics of tweening and animations
- src/se/tube42/example/demo2        - demonstrates use of deltas to modify animations
- src/se/tube42/example/demo3        - demonstrates use of markers to modify animations
- src/se/tube42/example/demo4        - demonstrates use of tail() to creates chains of tweens
+ src/se/tube42/example/demo1        - demonstrates basics of tweening
+ src/se/tube42/example/demo2        - demonstrates use of finish() to detect end of tweening
+ src/se/tube42/example/demo3        - demonstrates use of tail() to creates chains of tweens
+ src/se/tube42/example/demo4        - demonstrates the different ease equations
 
 
 Advanced topics
 ---------------
 If you are a n00b, you can safely ignore this part...
 
-Animation deltas
-~~~~~~~~~~~~~~~~
-For more information about animation deltas, take a look at demo2.
-
-Animation markers
-~~~~~~~~~~~~~~~~~
-For more information about animation markers, take a look at demo3.
-
-Note that markers are mostly to be used with third-party tools such as animation editors. 
-Normally, developers should not need to touch them.
-
 
 Garbage collection
 ~~~~~~~~~~~~~~~~~~
-If you are afraid of the big-bad-garbage-collector, avoid using AnimationBuilder in your game 
-loop as it is quite heavyweight and allocates a lot of memory. 
-The marker operations are the exception to this rule, you can use them as much as you want :)
-
-Other tweening operations use memory pools and should not generate garbage when used.
+Don't worry, we take care of GC for you by using memory pools internally ;)

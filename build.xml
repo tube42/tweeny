@@ -21,6 +21,17 @@
     <jar jarfile="Tweeny_lib.jar" basedir="${build}" includes="se/tube42/lib/**" />
   </target>
   
+  <!-- unit testing -->
+  <target name="test" depends="compile" >           
+    <junit haltonerror="true" haltonfailure="true" >      
+      <classpath path="${build}" />                     
+      <formatter type="brief" usefile="false" />      
+      <batchtest fork="no" todir="${build}">
+        <fileset dir="${src}" includes="se/tube42/test/**/*.java" />            
+      </batchtest>  
+    </junit>       
+  </target>
+  
   <!-- demos and examples -->
   <target name="ease1" depends="compile" >
     <java classname="se.tube42.example.ease1.Main" fork="yes">
@@ -81,15 +92,17 @@
   <target name="help">
     <echo>
       build     build the code
+      test      run test units
+      doc       create API docs
+      dist      create library jar file
+      clean     clean up
+      
       demo1     run the simple demo code
       demo2     run the animation and delta demo
       demo3     run the dynamic animation demo
       demo4     run the tween-tailing demo
       demo5     run the finish() demo
       ease1     run the easeing example code      
-      dist      create library jar file
-      doc       create API docs
-      clean     clean up
       
       publish **INTERNAL USE ONLY: UPLOADS DIST TO GITHUB**
     </echo>
