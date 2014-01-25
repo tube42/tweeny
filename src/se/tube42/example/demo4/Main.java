@@ -45,8 +45,7 @@ public class Main extends BaseWindow
         // The graph window...
         Frame f = new Frame("The euqations...");
         f.addWindowListener(wc);        
-        f.setVisible(true);
-        f.setSize(84 * n, 84 * n);
+        f.setVisible(true);        
         
         f.setLayout(new GridLayout(n, n));
         for(int i = 0; i < eqs.length; i++) 
@@ -54,6 +53,9 @@ public class Main extends BaseWindow
         
         setLocation(10, 10);
         f.setLocation(100 + getWidth(), 10);
+        f.setSize(100, 100);        
+        f.setSize(84 * n, 84 * n);
+        
         this.toFront();
         
         // -------------------------------------
@@ -85,7 +87,7 @@ public class Main extends BaseWindow
             tmp = ei.pause(ExampleItem.ITEM_Y, -100, 2f)
                   .tail(y2).configure(t, TweenEquation.BACK_OUT)
                   .pause(1f)
-                  .tail(y1).configure(1, TweenEquation.BACK_IN)
+                  .tail(y1).configure(1, TweenEquation.BACK_IN);
         }
         
         // mark start and end of initial animation

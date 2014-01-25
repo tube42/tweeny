@@ -145,7 +145,7 @@ public class Item
     
     public final TweenNode pause(int index, float val, float time)
     {
-        return TweenManager.addTween(this, index, val, val)
+        return TweenManager.addTween(this, index, val, val, true)
               .configure(time, null);
     }    
     

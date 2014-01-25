@@ -30,7 +30,7 @@ public final class TweenManager
     // dummy item, not animated. see addTween for usage
     private static ItemProperty ip_dummy = new ItemProperty();    
         
-    private static boolean allow_empty = true;
+    private static boolean allow_empty = false;
     
     // ---------------------------------------------------------
     // TweenNode pool
@@ -149,6 +149,12 @@ public final class TweenManager
     
     /* package */ static ItemProperty addTween(Item item, int index, 
               float v0, float v1)
+    {
+        return addTween(item, index, v0, v1, allow_empty);
+    }
+    
+    /* package */ static ItemProperty addTween(Item item, int index, 
+              float v0, float v1, boolean allow_empty)
     {
         
         // no movement at all? don't add it

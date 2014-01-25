@@ -106,11 +106,7 @@ You can even start a tween with a pause:
     .tail(20f).configure(1f, TweenEquation.LINEAR)           // <-- first tween
     .tail(10f).configure(0.5f, TweenEquation.LINEAR);        // <-- second tween
 
-Pauses are as expensive as tweens, so don't use a tons of pauses if you dont really have to. 
-Also, pauses are empty tweens so if you do this they will stop to work
-::
-    TweenManager.allowEmptyTweens(false);
-    
+Pauses are as expensive as tweens, so don't use a tons of pauses if you dont really have to.     
 
 I need more information!
 ~~~~~~~~~~~~~~~~~~~~~~~~
