@@ -193,11 +193,12 @@ public final class TweenManager
     
     /* package */ static void removeTween(ItemProperty ip, boolean finish)
     {
-        ip.removeTails();        
-        ip.active = false;
         if(finish)
-            ip.item.data[ip.index] = ip.v1;
+            ip.item.data[ip.index] = ip.getChainFinalValue();
+        ip.removeTails();  
+        ip.active = false;
     }
+     
     
     
     /* package */ static void removeTween(Item item, int index, boolean finish)

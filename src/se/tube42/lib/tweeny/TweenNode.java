@@ -168,5 +168,14 @@ public class TweenNode
         configure(1f, TweenEquation.LINEAR);
         this.tail = null;        
         this.on_end = null;
+    }    
+    
+    /* package */ float getChainFinalValue()
+    {
+        TweenNode t = this;
+        while(t.tail != null)
+            t = t.tail;
+        return t.v1;
     }
+    
 }
