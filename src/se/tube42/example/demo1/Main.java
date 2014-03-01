@@ -7,7 +7,7 @@ import java.util.*;
 import se.tube42.lib.tweeny.*;
 import se.tube42.example.common.*;
 
-/** Tweeny demo1 */
+/** basic tweening demo */
 public class Main 
 extends BaseWindow 
 {

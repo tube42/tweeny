@@ -2,95 +2,163 @@ package se.tube42.example.demo3;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import se.tube42.lib.tweeny.*;
 import se.tube42.example.common.*;
 
-/** Tweeny demo 3: tail chaining */
-public class Main 
-extends BaseWindow 
-implements MouseListener
+/**
+ * this class demonstrates some tweeny functions
+ */
+public class Main extends BaseWindow
 {
-    private static final int POINTS = 32;
-    private PointItem point;
-    private int [] points;
-    private int cnt;
+    private static final Random rnd = new Random();
+    
+    private final TweenEquation [] eqs = {
+        TweenEquation.LINEAR,
+        TweenEquation.DELAYED,
+        TweenEquation.DISCRETE,        
+        TweenEquation.QUAD_IN,
+        TweenEquation.QUAD_OUT,
+        TweenEquation.QUAD_INOUT,
+        TweenEquation.CUBE_IN,
+        TweenEquation.CUBE_OUT,
+        TweenEquation.SIN_IN,
+        TweenEquation.SIN_OUT,        
+        TweenEquation.BACK_IN,
+        TweenEquation.BACK_OUT,
+        TweenEquation.TUBE42_1,
+        TweenEquation.TUBE42_2,        
+        TweenEquation.ELASTIC_IN,
+        TweenEquation.ELASTIC_OUT
+    };
+    
+    private Checkbox slowdown, allow_empty;
+    private ExampleItem [] items;
     
     public Main()
-    {                
-        setTitle("Tail test");
+    {      
+        setTitle("Ease equations");
         
-        this.point = new PointItem(Color.RED, 100, 100);
-        this.points = new int[POINTS * 2];
-        this.cnt = 0;
+        final int n = (int)Math.ceil(Math.sqrt( eqs.length));        
+
+        // The graph window...
+        Frame f = new Frame("The euqations...");
+        f.addWindowListener(wc);        
+        f.setVisible(true);        
         
-        for(int i = 0; i < 6; i++, cnt++) {
-            points[cnt*2+0] = 64 + i * 128;
-            points[cnt*2+1] = 64 + (i & 1) * 128;
+        f.setLayout(new GridLayout(n, n));
+        for(int i = 0; i < eqs.length; i++) 
+            f.add( new EquationCanvas(eqs[i]));        
+        
+        setLocation(10, 10);
+        f.setLocation(100 + getWidth(), 10);
+        f.setSize(100, 100);        
+        f.setSize(84 * n, 84 * n);
+        
+        this.toFront();
+        
+        // -------------------------------------
+        Panel p = new Panel(new FlowLayout(FlowLayout.LEFT));
+        add(p, BorderLayout.NORTH);
+        p.add(slowdown = new Checkbox("Slow down", false));
+        p.add(new Label("    "));
+        p.add( allow_empty = new Checkbox("Allow empty tweens", true));
+        // create two items
+        items = new ExampleItem[ eqs.length];
+        for(int i = 0; i < items.length; i++) {
+            ExampleItem it = items[i] = new ExampleItem();
+            it.setPosition(132, 12 + i * 40);
+            it.setSize(33, 33);            
+            it.setPositionEquation(eqs[i]);            
+        }
+        TweenManager.removeTweens(true); // commit all tweens
+        
+        
+        // create a bunch of animation to show before we start
+        TweenNode tmp = null;
+        for(int i = 0; i < items.length; i++) {            
+            final ExampleItem ei = items[i];
+            final float t = 0.3f + 0.05f * (rnd.nextInt() & 7); 
+            
+            final float y1 = i * 40 + 12;
+            final float y2 = ((i + 4) % items.length) * 40 + 12;
+            
+            tmp = ei.pause(ExampleItem.ITEM_Y, -100, 2f)
+                  .tail(y2).configure(t, TweenEquation.BACK_OUT)
+                  .pause(1f)
+                  .tail(y1).configure(1, TweenEquation.BACK_IN);
         }
         
-        canvas.addMouseListener(this);
-        setSize(800, 400);        
+        // mark start and end of initial animation
+        System.out.println("FYI: starting the initial animation");                        
+                
+        tmp.pause(0.5f).finish(new Runnable() {
+                  public void run(){
+                  System.out.println("FYI: animation ended. Reseting equations");
+                  for(int i = 0; i < items.length; i++) items[i].setPositionEquation(eqs[i]);
+              }
+              });
+        
+        
+        setSize(540, 800);        
         start();                
     }
     
+    private boolean forward = false;
+    private int speed = 0;
+    
+    int x = 0;
+    public boolean frame(long dt)
+    {
+        // allow empty tweens?
+        TweenManager.allowEmptyTweens(allow_empty.getState());
+        
+        // possibly slow down and run a frame
+        if(slowdown.getState())
+            dt = Math.max(1, dt / 4);        
+        boolean ret = super.frame(dt);
+                
+        // nothing to tween? move some stuff            
+        if(!ret) {
+            forward = !forward;                        
+            int x = forward ? canvas.getWidth() - 80 - 32 : 132;
+            for(int i = 0; i < items.length; i++) {
+                items[i].setPosition(x, 12 + i * 40);                
+            }
+            
+            // change the speed
+            if(!forward) {
+                final float t = 0.5f + speed * 0.5f;
+                speed = (speed + 1) & 7;
+                setTitle("[Tweeny test] time=" + t + (slowdown.getState() ? " (slowed down)" : "") );
+                
+                for(int i = 0; i < items.length; i++)                         
+                    items[i].setPositionDuration(t); 
+            }
+        }
+        
+        return ret;        
+    }
     
     public void paintCanvas(Graphics g, int w, int h)
     {
-        // clear screen
+        
+        // draw to back buffer: clear screen and draw each item
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, w, h);
         
-        // draw help text
-        g.setColor(Color.BLACK);
-        g.drawString("Left click to add one point", 30, 50);
-        g.drawString("Right click to start the tweening", 30, 90);
-                
-        // draw the lines
-        int lx = 0, ly = 0;
-        g.setColor(Color.BLACK);        
-        for(int i = 0; i < cnt; i++) {             
-            if(i != 0) g.drawLine(lx, ly, points[i*2], points[i*2+1]);            
-            lx = points[i*2];
-            ly = points[i*2+1];
-        }
+        // draw the line representing current time:
+        final int x = (int)(0.5f + items[0].getX()) + items[0].w / 2;
+        g.setColor(items[0].c);
+        g.drawLine(x, 0, x, h);
         
-        // draw the points
-        g.setColor(Color.BLUE);        
-        for(int i = 0; i < cnt; i++)
-            g.fillRect(points[i*2 + 0] - 12, points[i*2 + 1] - 12, 24, 24);           
+        // draw all items
+        for(int i = 0; i < items.length; i++)
+           items[i].draw(g);
         
-        // draw the items
-        point.draw(g);
     }
     
-    
-    // ----------------------------------    
-    public void mousePressed(MouseEvent e)
-    {                 
-        if( e.getButton() != MouseEvent.BUTTON1) {
-            if(cnt > 0) {
-                // run the chain
-                TweenNode tn1 = point.set(PointItem.ITEM_X, points[0]).
-                      configure(0.1f, TweenEquation.QUAD_IN);                      
-                TweenNode tn2 = point.set(PointItem.ITEM_Y, points[1]).
-                      configure(0.1f, TweenEquation.QUAD_IN);
-                
-                for(int i = 1; i < cnt; i++){
-                    tn1 = tn1.tail(points[i*2+0]).configure(0.3f, TweenEquation.QUAD_IN);
-                    tn2 = tn2.tail(points[i*2+1]).configure(0.3f, TweenEquation.QUAD_IN);
-                }
-            }
-        } else {
-            // add a point
-            points[cnt * 2 + 0] = e.getX();
-            points[cnt * 2 + 1] = e.getY();
-            cnt++;
-            if(cnt >= POINTS) cnt = 0;
-        }
-    }
-    
-    // -------------------------------------------
     
     public static void main(String []args)
     {

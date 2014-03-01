@@ -32,14 +32,7 @@
     </junit>       
   </target>
   
-  <!-- demos and examples -->
-  <target name="ease1" depends="compile" >
-    <java classname="se.tube42.example.ease1.Main" fork="yes">
-      <classpath path="${build}"/>      
-    </java>
-  </target>
-  
-  
+  <!-- demos and examples -->  
   <target name="demo1" depends="compile" >
     <java classname="se.tube42.example.demo1.Main" fork="yes">
       <classpath path="${build}"/>      
@@ -97,12 +90,7 @@
       dist      create library jar file
       clean     clean up
       
-      demo1     run the simple demo code
-      demo2     run the animation and delta demo
-      demo3     run the dynamic animation demo
-      demo4     run the tween-tailing demo
-      demo5     run the finish() demo
-      ease1     run the easeing example code      
+      demoN     various examples and demos (N = 1 ... 5)
       
       publish **INTERNAL USE ONLY: UPLOADS DIST TO GITHUB**
     </echo>

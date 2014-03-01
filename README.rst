@@ -117,9 +117,11 @@ From the source tree, do this to build the API docs
 If you want to see some examples, take look at these directories
 :: 
  src/se/tube42/example/demo1        - demonstrates basics of tweening
- src/se/tube42/example/demo2        - demonstrates use of finish() to detect end of tweening
- src/se/tube42/example/demo3        - demonstrates use of tail() to creates chains of tweens
- src/se/tube42/example/demo4        - demonstrates the different ease equations
+ src/se/tube42/example/demo2        - demonstrates use of tail() to creates chains of tweens 
+ src/se/tube42/example/demo3        - demonstrates the different ease equations 
+ src/se/tube42/example/demo4        - demonstrates use of finish(Runnable) to detect end of tweening
+ src/se/tube42/example/demo5        - demonstrates use of finish(TweenListener) for animation
+ 
 
 
 Advanced topics

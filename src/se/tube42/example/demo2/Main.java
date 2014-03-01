@@ -6,51 +6,32 @@ import java.awt.event.*;
 import se.tube42.lib.tweeny.*;
 import se.tube42.example.common.*;
 
-/** Tweeny demo 2: finish() example */
+/** tail chaining */
 public class Main 
 extends BaseWindow 
 implements MouseListener
 {
-    private static final int 
-          POINTS = 8,
-          HEIGHT = 300,
-          WIDTH = 1024 + 20;
-          ;
-    private static final float
-          TIME_MOVE = 0.5f,
-          TIME_MARK = 0.2f
-          ;
-    
-    private Checkbox cb_slow;    
+    private static final int POINTS = 32;
     private PointItem point;
-    private PointItem [] markers;
+    private int [] points;
     private int cnt;
     
     public Main()
     {                
-        setTitle("finsh() test");
+        setTitle("Tail test");
         
-        // allow empty tweens for this demo
-        TweenManager.allowEmptyTweens(true);
-                
-        // the markers are used to indicate that we have detected finish()
-        this.markers = new PointItem[POINTS];        
-        for(int i = 0; i < POINTS; i++) {
-            int x = 10 + (WIDTH - 20) * i / POINTS;
-            markers[i] = new PointItem(Color.BLUE, x, HEIGHT * 3 / 5);
+        this.point = new PointItem(Color.RED, 100, 100);
+        this.points = new int[POINTS * 2];
+        this.cnt = 0;
+        
+        for(int i = 0; i < 6; i++, cnt++) {
+            points[cnt*2+0] = 64 + i * 128;
+            points[cnt*2+1] = 64 + (i & 1) * 128;
         }
         
-        // this is the point that will tween across the screen
-        this.point = new PointItem(Color.RED, 10, HEIGHT * 2 / 5);
-        
-        // set up UI
-        Panel panel = new Panel();
-        add(panel, BorderLayout.NORTH);
-        panel.add(cb_slow = new Checkbox("Slow down", false));
-                
         canvas.addMouseListener(this);
-        setSize(WIDTH, HEIGHT);
-        start();     
+        setSize(800, 400);        
+        start();                
     }
     
     
@@ -62,48 +43,51 @@ implements MouseListener
         
         // draw help text
         g.setColor(Color.BLACK);
-        g.drawString("Click to start the tweening", 10, HEIGHT * 1 / 5);
-
+        g.drawString("Left click to add one point", 30, 50);
+        g.drawString("Right click to start the tweening", 30, 90);
+                
+        // draw the lines
+        int lx = 0, ly = 0;
+        g.setColor(Color.BLACK);        
+        for(int i = 0; i < cnt; i++) {             
+            if(i != 0) g.drawLine(lx, ly, points[i*2], points[i*2+1]);            
+            lx = points[i*2];
+            ly = points[i*2+1];
+        }
+        
+        // draw the points
+        g.setColor(Color.BLUE);        
+        for(int i = 0; i < cnt; i++)
+            g.fillRect(points[i*2 + 0] - 12, points[i*2 + 1] - 12, 24, 24);           
+        
         // draw the items
         point.draw(g);
-        for(int i = 0; i < POINTS; i++) 
-            markers[i].draw(g);
-            
     }
     
     
     // ----------------------------------    
     public void mousePressed(MouseEvent e)
     {                 
-        // create a tweening acress the screen, for each point reached, add a finish() handler
-        TweenNode tmp = point.set(PointItem.ITEM_X, 0).configure(0.01f, null);        
-        for(int i = 0; i < POINTS; i++) {
-            final float x = markers[i].get(PointItem.ITEM_X);            
-            tmp = tmp.tail(x).configure(TIME_MOVE, null);      
-            tmp = tmp.finish( create(i));
-            
-        }
-    }
-    
-    // create a finish handler for this
-    // (in a real application, we would create POINT number of these at start up and re-use them)
-    private Runnable create(final int k)
-    {        
-        return new Runnable() 
-        { 
-            public void run() 
-            {
-                markers[k].set(PointItem.ITEM_S, 2).configure(TIME_MARK, null).
-                      tail(1).configure(TIME_MARK, null);
+        if( e.getButton() != MouseEvent.BUTTON1) {
+            if(cnt > 0) {
+                // run the chain
+                TweenNode tn1 = point.set(PointItem.ITEM_X, points[0]).
+                      configure(0.1f, TweenEquation.QUAD_IN);                      
+                TweenNode tn2 = point.set(PointItem.ITEM_Y, points[1]).
+                      configure(0.1f, TweenEquation.QUAD_IN);
+                
+                for(int i = 1; i < cnt; i++){
+                    tn1 = tn1.tail(points[i*2+0]).configure(0.3f, TweenEquation.QUAD_IN);
+                    tn2 = tn2.tail(points[i*2+1]).configure(0.3f, TweenEquation.QUAD_IN);
+                }
             }
-        };
-    }
-    
-    // modofied frame funciton to allow slowing down animation
-    public boolean frame(long dt)
-    {
-        if(cb_slow.getState()) dt /= 4;        
-        return super.frame(dt);
+        } else {
+            // add a point
+            points[cnt * 2 + 0] = e.getX();
+            points[cnt * 2 + 1] = e.getY();
+            cnt++;
+            if(cnt >= POINTS) cnt = 0;
+        }
     }
     
     // -------------------------------------------

@@ -2,163 +2,111 @@ package se.tube42.example.demo4;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 
 import se.tube42.lib.tweeny.*;
 import se.tube42.example.common.*;
 
-/**
- * this class demonstrates some tweeny functions
- */
-public class Main extends BaseWindow
+/** finish(Runnable) example */
+public class Main 
+extends BaseWindow 
+implements MouseListener
 {
-    private static final Random rnd = new Random();
+    private static final int 
+          POINTS = 8,
+          HEIGHT = 300,
+          WIDTH = 1024 + 20;
+          ;
+    private static final float
+          TIME_MOVE = 0.5f,
+          TIME_MARK = 0.2f
+          ;
     
-    private final TweenEquation [] eqs = {
-        TweenEquation.LINEAR,
-        TweenEquation.DELAYED,
-        TweenEquation.DISCRETE,        
-        TweenEquation.QUAD_IN,
-        TweenEquation.QUAD_OUT,
-        TweenEquation.QUAD_INOUT,
-        TweenEquation.CUBE_IN,
-        TweenEquation.CUBE_OUT,
-        TweenEquation.SIN_IN,
-        TweenEquation.SIN_OUT,        
-        TweenEquation.BACK_IN,
-        TweenEquation.BACK_OUT,
-        TweenEquation.TUBE42_1,
-        TweenEquation.TUBE42_2,        
-        TweenEquation.ELASTIC_IN,
-        TweenEquation.ELASTIC_OUT
-    };
-    
-    private Checkbox slowdown, allow_empty;
-    private ExampleItem [] items;
+    private Checkbox cb_slow;    
+    private PointItem point;
+    private PointItem [] markers;
+    private int cnt;
     
     public Main()
-    {      
-        setTitle("Ease equations");
+    {                
+        setTitle("finish(Runnable) test");
         
-        final int n = (int)Math.ceil(Math.sqrt( eqs.length));        
-
-        // The graph window...
-        Frame f = new Frame("The euqations...");
-        f.addWindowListener(wc);        
-        f.setVisible(true);        
-        
-        f.setLayout(new GridLayout(n, n));
-        for(int i = 0; i < eqs.length; i++) 
-            f.add( new EquationCanvas(eqs[i]));        
-        
-        setLocation(10, 10);
-        f.setLocation(100 + getWidth(), 10);
-        f.setSize(100, 100);        
-        f.setSize(84 * n, 84 * n);
-        
-        this.toFront();
-        
-        // -------------------------------------
-        Panel p = new Panel(new FlowLayout(FlowLayout.LEFT));
-        add(p, BorderLayout.NORTH);
-        p.add(slowdown = new Checkbox("Slow down", false));
-        p.add(new Label("    "));
-        p.add( allow_empty = new Checkbox("Allow empty tweens", true));
-        // create two items
-        items = new ExampleItem[ eqs.length];
-        for(int i = 0; i < items.length; i++) {
-            ExampleItem it = items[i] = new ExampleItem();
-            it.setPosition(132, 12 + i * 40);
-            it.setSize(33, 33);            
-            it.setPositionEquation(eqs[i]);            
-        }
-        TweenManager.removeTweens(true); // commit all tweens
-        
-        
-        // create a bunch of animation to show before we start
-        TweenNode tmp = null;
-        for(int i = 0; i < items.length; i++) {            
-            final ExampleItem ei = items[i];
-            final float t = 0.3f + 0.05f * (rnd.nextInt() & 7); 
-            
-            final float y1 = i * 40 + 12;
-            final float y2 = ((i + 4) % items.length) * 40 + 12;
-            
-            tmp = ei.pause(ExampleItem.ITEM_Y, -100, 2f)
-                  .tail(y2).configure(t, TweenEquation.BACK_OUT)
-                  .pause(1f)
-                  .tail(y1).configure(1, TweenEquation.BACK_IN);
-        }
-        
-        // mark start and end of initial animation
-        System.out.println("FYI: starting the initial animation");                        
+        // allow empty tweens for this demo
+        TweenManager.allowEmptyTweens(true);
                 
-        tmp.pause(0.5f).finish(new Runnable() {
-                  public void run(){
-                  System.out.println("FYI: animation ended. Reseting equations");
-                  for(int i = 0; i < items.length; i++) items[i].setPositionEquation(eqs[i]);
-              }
-              });
+        // the markers are used to indicate that we have detected finish()
+        this.markers = new PointItem[POINTS];        
+        for(int i = 0; i < POINTS; i++) {
+            int x = 10 + (WIDTH - 20) * i / POINTS;
+            markers[i] = new PointItem(Color.BLUE, x, HEIGHT * 3 / 5);
+        }
         
+        // this is the point that will tween across the screen
+        this.point = new PointItem(Color.RED, 10, HEIGHT * 2 / 5);
         
-        setSize(540, 800);        
-        start();                
+        // set up UI
+        Panel panel = new Panel();
+        add(panel, BorderLayout.NORTH);
+        panel.add(cb_slow = new Checkbox("Slow down", false));
+                
+        canvas.addMouseListener(this);
+        setSize(WIDTH, HEIGHT);
+        start();     
     }
     
-    private boolean forward = false;
-    private int speed = 0;
-    
-    int x = 0;
-    public boolean frame(long dt)
-    {
-        // allow empty tweens?
-        TweenManager.allowEmptyTweens(allow_empty.getState());
-        
-        // possibly slow down and run a frame
-        if(slowdown.getState())
-            dt = Math.max(1, dt / 4);        
-        boolean ret = super.frame(dt);
-                
-        // nothing to tween? move some stuff            
-        if(!ret) {
-            forward = !forward;                        
-            int x = forward ? canvas.getWidth() - 80 - 32 : 132;
-            for(int i = 0; i < items.length; i++) {
-                items[i].setPosition(x, 12 + i * 40);                
-            }
-            
-            // change the speed
-            if(!forward) {
-                final float t = 0.5f + speed * 0.5f;
-                speed = (speed + 1) & 7;
-                setTitle("[Tweeny test] time=" + t + (slowdown.getState() ? " (slowed down)" : "") );
-                
-                for(int i = 0; i < items.length; i++)                         
-                    items[i].setPositionDuration(t); 
-            }
-        }
-        
-        return ret;        
-    }
     
     public void paintCanvas(Graphics g, int w, int h)
     {
-        
-        // draw to back buffer: clear screen and draw each item
+        // clear screen
         g.setColor(Color.GRAY);
         g.fillRect(0, 0, w, h);
         
-        // draw the line representing current time:
-        final int x = (int)(0.5f + items[0].getX()) + items[0].w / 2;
-        g.setColor(items[0].c);
-        g.drawLine(x, 0, x, h);
-        
-        // draw all items
-        for(int i = 0; i < items.length; i++)
-           items[i].draw(g);
-        
+        // draw help text
+        g.setColor(Color.BLACK);
+        g.drawString("Click to start the tweening", 10, HEIGHT * 1 / 5);
+
+        // draw the items
+        point.draw(g);
+        for(int i = 0; i < POINTS; i++) 
+            markers[i].draw(g);
+            
     }
     
+    
+    // ----------------------------------    
+    public void mousePressed(MouseEvent e)
+    {                 
+        // create a tweening acress the screen, for each point reached, add a finish() handler
+        TweenNode tmp = point.set(PointItem.ITEM_X, 0).configure(0.01f, null);        
+        for(int i = 0; i < POINTS; i++) {
+            final float x = markers[i].get(PointItem.ITEM_X);            
+            tmp = tmp.tail(x).configure(TIME_MOVE, null);      
+            tmp = tmp.finish( create(i));
+            
+        }
+    }
+    
+    // create a finish handler for this
+    // (in a real application, we would create POINT number of these at start up and re-use them)
+    private Runnable create(final int k)
+    {        
+        return new Runnable() 
+        { 
+            public void run() 
+            {
+                markers[k].set(PointItem.ITEM_S, 2).configure(TIME_MARK, null).
+                      tail(1).configure(TIME_MARK, null);
+            }
+        };
+    }
+    
+    // modified frame funciton to allow slowing down animation
+    public boolean frame(long dt)
+    {
+        if(cb_slow.getState()) dt /= 4;        
+        return super.frame(dt);
+    }
+    
+    // -------------------------------------------
     
     public static void main(String []args)
     {

@@ -243,14 +243,15 @@ public final class TweenManager
                 
                 ip.update(ip.duration_inv * dt);                
                 
-                if(ended) {                    
+                /*
+                if(ended) {
                     // see if there is a runable
                     // we use the active flag to check if is has re-added itself in run()                    
-                    if(ip.on_end != null) {
-                        final boolean old_active = ip.active;                                        
-                        ip.active = false;                                                    
+                    if(ip.on_end_r != null) {
+                        final boolean old_active = ip.active;                                 
+                        ip.active = false;
                         try {
-                            ip.on_end.run();
+                            ip.on_end_r.run();
                         } catch(Exception ignored) { }
                         if(ip.active) // self-modified, this tween is no longer dead!
                             ended = false;
@@ -258,12 +259,32 @@ public final class TweenManager
                             ip.active = old_active;
                     }
                 }
-                
-                if(ended) {                        
+                */
+                if(ended) {
+                    final Runnable r = ip.on_end_r;
+                    final TweenListener tl = ip.on_end_l;
+                    final int msg = ip.on_end_m;
+                    final int index = ip.index;
+                    final Item item = ip.item;
+                    
                     if(!ip.processTail())
                         ip.active = false; // really ended
                     else
-                        ip.time_start = time_f; // tails exist, started a new node                                        
+                        ip.time_start = time_f; // tails exist, started a new node
+                    
+                    // run runnable
+                    if(r != null) {
+                        try {
+                            r.run();
+                         } catch(Exception ignored) { }
+                    }
+                    
+                    // run listener
+                    if(tl != null) {
+                        try {
+                            tl.onFinish(item, index, msg);
+                        } catch(Exception ignored) { }
+                    }
                 }
             }
             

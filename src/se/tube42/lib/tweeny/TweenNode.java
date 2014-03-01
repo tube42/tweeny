@@ -88,7 +88,10 @@ import java.util.*;
         
         final TweenNode tmp = tail;
         this.tail = tmp.tail;
-        this.on_end = tmp.on_end;
+        
+        this.on_end_r = tmp.on_end_r;
+        this.on_end_l = tmp.on_end_l;
+        this.on_end_m = tmp.on_end_m;
         
         // install this tail as the current target
         this.v0 = this.v1;
@@ -108,7 +111,10 @@ public class TweenNode
 {
     /* package */ float v1;
     /* package */ float duration;
-    /* package */ Runnable on_end;
+    /* package */ Runnable on_end_r;
+    /* package */ TweenListener on_end_l;
+    /* package */ int on_end_m;
+    
     protected TweenEquation equation;
     protected TweenNode tail;
     
@@ -132,7 +138,14 @@ public class TweenNode
     
     public TweenNode finish(Runnable r)
     {
-        this.on_end = r;
+        this.on_end_r = r;
+        return this;
+    }
+    
+    public TweenNode finish(TweenListener tl, int msg)
+    {
+        this.on_end_l = tl;
+        this.on_end_m = msg;
         return this;
     }
     
@@ -167,7 +180,8 @@ public class TweenNode
     {   
         configure(1f, TweenEquation.LINEAR);
         this.tail = null;        
-        this.on_end = null;
+        this.on_end_r = null;
+        this.on_end_l = null;
     }    
     
     /* package */ float getChainFinalValue()
