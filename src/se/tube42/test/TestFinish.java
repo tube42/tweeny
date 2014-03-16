@@ -17,6 +17,12 @@ public class TestFinish
 {
     public static final float DELTA = 0.0001f;
    
+    @Before public void initialize() 
+  	{
+  		// this will ensure clean state for each test
+  		TweenManager.reset(); 
+    } 
+
     @Test public void testFinish()
     {
         DummyRunnable r1 = new DummyRunnable();

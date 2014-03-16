@@ -26,7 +26,13 @@ import se.tube42.lib.tweeny.*;
 public class TestListener
 {
     public static final float DELTA = 0.0001f;
-    
+   
+   	@Before public void initialize() 
+   	{
+   		// this will ensure clean state for each test
+   		TweenManager.reset(); 
+    } 
+
     public static void assertListener(DummyListener dl, int cnt, int index, Item item, int msg, String text)
     {
         Assert.assertEquals("cnt " + text, cnt, dl.cnt);        

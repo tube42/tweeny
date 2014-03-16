@@ -71,16 +71,7 @@ import java.util.*;
         this.duration_inv = 1f / this.duration;        
         return this;
     }
-    
-    // ----------------------------------------------------
-    public void removeTails()
-    {
-        for(TweenNode t = this; t.tail != null; t = t.tail)
-            TweenManager.nodes_pool_put(t.tail);
-        
-        this.tail = null;
-    }
-    
+
     public boolean processTail()
     {
         if(tail == null)
@@ -179,11 +170,25 @@ public class TweenNode
     /* package */ void reset()
     {   
         configure(1f, TweenEquation.LINEAR);
+        removeCallbacks();		
         this.tail = null;        
-        this.on_end_r = null;
-        this.on_end_l = null;
     }    
     
+    /* package */ void removeCallbacks()
+    {
+        this.on_end_r = null;
+        this.on_end_l = null;
+    }
+    
+    /* package */ void removeTails()
+    {
+    	if(tail != null) {
+    		tail.removeTails();
+    		TweenManager.nodes_pool_put(tail);		
+			tail = null;
+    	}
+    }
+
     /* package */ float getChainFinalValue()
     {
         TweenNode t = this;

@@ -15,24 +15,43 @@ public final class TweenManager
     // but as the float time grows, addition with small numbers will stop working.
     // Hence we track time with a long and convert it to a float.
     // To avoid further problems, we also reset then when no tweens are queued
-    private static long time_l = 0;    
-    private static float time_f = 0;
-    private static int items_cnt = 0;    
-    private static int items_pool_cnt = 0;
-    private static int items_new_cnt = 0;    
-    private static int nodes_pool_cnt = 0;
-    private static int nodes_new_cnt = 0;
+    private static long time_l;    
+    private static float time_f;
+    private static int items_cnt;    
+    private static int items_pool_cnt;
+    private static int items_new_cnt;    
+    private static int nodes_pool_cnt;
+    private static int nodes_new_cnt;
     
-    private static ItemProperty [] items = new ItemProperty[64];
-    private static ItemProperty [] items_pool = new ItemProperty[64];
-    private static TweenNode [] nodes_pool = new TweenNode[64];        
-    
+    private static ItemProperty [] items;
+    private static ItemProperty [] items_pool;
+    private static TweenNode [] nodes_pool;
+   
     // dummy item, not animated. see addTween for usage
-    private static ItemProperty ip_dummy = new ItemProperty();    
-        
+    private static ItemProperty ip_dummy = new ItemProperty();            
     private static boolean allow_empty = false;
     
+   // ---------------------------------------------------------
+
+    static {
+    	reset();
+    }
+
+    /** reset manager state. note that this will reset all standing tweens
+     * and leak memory */
+    public static void reset()
+    {
+		time_l = 0;    
+    	time_f = 0;
+		items_cnt = items_pool_cnt = items_new_cnt = nodes_pool_cnt = nodes_new_cnt = 0;
+    	items = new ItemProperty[64];
+    	items_pool = new ItemProperty[64];
+    	nodes_pool = new TweenNode[64];        
+   		ip_dummy = new ItemProperty();
+    }
+
     // ---------------------------------------------------------
+
     // TweenNode pool
     /* package */ final static TweenNode nodes_pool_get()
     {
@@ -170,7 +189,8 @@ public final class TweenManager
         if(ip == null) {
             ip = item.properties[index] = items_pool_get();                        
         } else {
-            ip.removeTails();  
+            ip.removeTails();
+            ip.removeCallbacks();
         }
         
         ip.set(item, index, v0, v1);
@@ -241,25 +261,8 @@ public final class TweenManager
                     ended = true;
                 }
                 
-                ip.update(ip.duration_inv * dt);                
-                
-                /*
-                if(ended) {
-                    // see if there is a runable
-                    // we use the active flag to check if is has re-added itself in run()                    
-                    if(ip.on_end_r != null) {
-                        final boolean old_active = ip.active;                                 
-                        ip.active = false;
-                        try {
-                            ip.on_end_r.run();
-                        } catch(Exception ignored) { }
-                        if(ip.active) // self-modified, this tween is no longer dead!
-                            ended = false;
-                        else
-                            ip.active = old_active;
-                    }
-                }
-                */
+                ip.update(ip.duration_inv * dt);                                
+
                 if(ended) {
                     final Runnable r = ip.on_end_r;
                     final TweenListener tl = ip.on_end_l;

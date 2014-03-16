@@ -12,6 +12,12 @@ public class TestRemove
 {
     public static final float DELTA = 0.0001f;
    
+    @Before public void initialize() 
+    {
+    	// this will ensure clean state for each test
+    	TweenManager.reset(); 
+     } 
+
     @Test public void testRemove()
     {
         Item it = new Item(2);        
