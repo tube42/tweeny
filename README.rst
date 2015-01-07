@@ -132,3 +132,23 @@ If you are a n00b, you can safely ignore this part...
 Garbage collection
 ~~~~~~~~~~~~~~~~~~
 Don't worry, we take care of GC for you by using memory pools internally ;)
+
+Building
+~~~~~~~~
+Build requirements in addition to the usual Java and Android stuff are ANT & JUnit 4, which can be a bit tricky on some systems:
+::
+ # on Ubuntu 14.04 
+ sudo apt-get install ant junit
+ sudo ln -s  /usr/share/java/junit4.jar /usr/share/ant/lib/unit4.jar
+ 
+To build and run the tests
+::
+ ant compile
+ ant test
+
+You can build the .jar library by executing
+::
+ ant dist
+
+You will need ant and ant-junit to do this.
+

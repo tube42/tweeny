@@ -84,7 +84,7 @@
   
   <target name="help">
     <echo>
-      build     build the code
+      compile   build the code
       test      run test units
       doc       create API docs
       dist      create library jar file

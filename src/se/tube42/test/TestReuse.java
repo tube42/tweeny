@@ -23,22 +23,22 @@ import se.tube42.lib.tweeny.*;
 public class TestReuse
 {
     public static final float DELTA = 0.0001f;
-   
-  	@Before public void initialize() 
+
+  	@Before public void initialize()
   	{
   		// this will ensure clean state for each test
-  		TweenManager.reset(); 
-    } 
+  		TweenManager.reset();
+    }
 
     @Test public void testReuseListener()
     {
         DummyListener r1 = new DummyListener();
         Item it1 = new Item(1);
         Item it2 = new Item(1);
-        
+
         // normal callback
         it1.set(0, 0, 1).configure(0.5f, null).finish(r1, 0);
-        it2.set(0, 0, 1).configure(0.5f, null).finish(r1, 0);        
+        it2.set(0, 0, 1).configure(0.5f, null).finish(r1, 0);
         for(int i = 0; i < 10; i++) TweenManager.service(500);
         Assert.assertEquals("listener after (1)", 2, r1.cnt);
 
@@ -50,32 +50,32 @@ public class TestReuse
 
         // normal callback replaced with a no callback
         it1.set(0, 0, 1).configure(0.5f, null).finish(r1, 0);
-        it2.set(0, 0, 1).configure(0.5f, null).finish(r1, 0);      
+        it2.set(0, 0, 1).configure(0.5f, null).finish(r1, 0);
         TweenManager.service(100);
 		it1.set(0, 0, 1).configure(0.5f, null);
         it2.set(0, 0, 1).configure(0.5f, null);
-        
+
         for(int i = 0; i < 10; i++)	TweenManager.service(500);
         Assert.assertEquals("listener after (3)", 2, r1.cnt);
 
  		// no callback replace with a normal callback
         it1.set(0, 0, 1).configure(0.5f, null);
-        it2.set(0, 0, 1).configure(0.5f, null); 
+        it2.set(0, 0, 1).configure(0.5f, null);
         TweenManager.service(100);
 		it1.set(0, 0, 1).configure(0.5f, null).finish(r1, 0);
         it2.set(0, 0, 1).configure(0.5f, null).finish(r1, 0);
-        
+
         for(int i = 0; i < 10; i++)	TweenManager.service(500);
-        Assert.assertEquals("listener after (4)", 4, r1.cnt);        
+        Assert.assertEquals("listener after (4)", 4, r1.cnt);
     }
-    
+
 
 	@Test public void testReuseRunnable()
     {
         DummyRunnable r1 = new DummyRunnable();
         Item it1 = new Item(1);
         Item it2 = new Item(1);
-        
+
         // normal callback
         it1.set(0, 0, 1).configure(0.5f, null).finish(r1);
         it2.set(0, 0, 1).configure(0.5f, null).finish(r1);
@@ -90,30 +90,30 @@ public class TestReuse
 
         // normal callback replace with a callback
         it1.set(0, 0, 1).configure(0.5f, null).finish(r1);
-        it2.set(0, 0, 1).configure(0.5f, null).finish(r1);      
-        
+        it2.set(0, 0, 1).configure(0.5f, null).finish(r1);
+
         TweenManager.service(100);
 		it1.set(0, 0, 1).configure(0.5f, null);
         it2.set(0, 0, 1).configure(0.5f, null);
-        
+
         for(int i = 0; i < 10; i++)	TweenManager.service(500);
         Assert.assertEquals("run after (3)", 2, r1.cnt);
 
 		// no callback replace with a normal callback
         it1.set(0, 0, 1).configure(0.5f, null);
-        it2.set(0, 0, 1).configure(0.5f, null); 
-        
+        it2.set(0, 0, 1).configure(0.5f, null);
+
         TweenManager.service(100);
 		it1.set(0, 0, 1).configure(0.5f, null).finish(r1);
         it2.set(0, 0, 1).configure(0.5f, null).finish(r1);
-        
+
         for(int i = 0; i < 10; i++)	TweenManager.service(500);
-        Assert.assertEquals("listener after (4)", 4, r1.cnt);          
-    }    
+        Assert.assertEquals("listener after (4)", 4, r1.cnt);
+    }
 
 
  	@Test public void testReuseTween()
-    {    
+    {
 		Item item = new Item(1);
 		Assert.assertEquals("active tweens (0)", 0, TweenManager.debugCountActiveTweens());
 		Assert.assertEquals("allocated tweens (0)", 0, TweenManager.debugCountAllocatedTweens());
@@ -125,7 +125,7 @@ public class TestReuse
 			Assert.assertEquals("Normal: active tweens (1)", 1, TweenManager.debugCountActiveTweens());
 			Assert.assertEquals("Normal: allocated tweens (1)", 1, TweenManager.debugCountAllocatedTweens());
 			Assert.assertEquals("Normal: pooled tweens (1)", 0, TweenManager.debugCountPoolTweens());
-	    	
+
 			TweenManager.service(1000);
 			Assert.assertEquals("Normal: active tweens (2)", 0, TweenManager.debugCountActiveTweens());
 			Assert.assertEquals("Normal: allocated tweens (2)", 1, TweenManager.debugCountAllocatedTweens());
@@ -138,7 +138,7 @@ public class TestReuse
 			Assert.assertEquals("Break: active tweens (1)", 1, TweenManager.debugCountActiveTweens());
 			Assert.assertEquals("Break: allocated tweens (1)", 1, TweenManager.debugCountAllocatedTweens());
 			Assert.assertEquals("Break: pooled tweens (1)", 0, TweenManager.debugCountPoolTweens());
-	    	
+
 			TweenManager.service(200);
 			Assert.assertEquals("Break: active tweens (2)", 1, TweenManager.debugCountActiveTweens());
 			Assert.assertEquals("Break: allocated tweens (2)", 1, TweenManager.debugCountAllocatedTweens());
@@ -153,7 +153,7 @@ public class TestReuse
     }
 
     @Test public void testReuseTweenRecursive()
-    {    
+    {
     	RestartListener rl = new RestartListener();
     	Item item = new Item(1);
 		Assert.assertEquals("active tweens (0)", 0, TweenManager.debugCountActiveTweens());
@@ -177,8 +177,8 @@ public class TestReuse
 
 
 	@Test public void testReuseNode()
-    {    
-		Item item = new Item(1);    	
+    {
+		Item item = new Item(1);
     	Assert.assertEquals("allocated nodes (0)", 0, TweenManager.debugCountAllocatedNodes());
 		Assert.assertEquals("pooled nodes (0)", 0, TweenManager.debugCountPoolNodes());
 
@@ -233,13 +233,13 @@ public class TestReuse
 			for(int j = 0; j < 10; j++)	TweenManager.service(500);
 		}
 		Assert.assertEquals("Break: allocated nodes (3)", 3, TweenManager.debugCountAllocatedNodes());
-		Assert.assertEquals("Break: pooled nodes (3)", 3, TweenManager.debugCountPoolNodes());		
+		Assert.assertEquals("Break: pooled nodes (3)", 3, TweenManager.debugCountPoolNodes());
     }
 
 
 
     @Test public void testReuseNodeRecursive()
-    {    
+    {
     	RestartListener rl = new RestartListener();
     	Item item = new Item(2);
     	Assert.assertEquals("allocated nodes (0)", 0, TweenManager.debugCountAllocatedNodes());
@@ -253,7 +253,7 @@ public class TestReuse
 				tn = tn.tail(j + 2).configure(0.5f, null);
 				if(i == j) tn.finish(rl, 8);
 			}
-			
+
 			Assert.assertEquals("rec: allocated nodes (1)", 3, TweenManager.debugCountAllocatedNodes());
 			Assert.assertEquals("rec: pooled nodes (1)", 0, TweenManager.debugCountPoolNodes());
 			for(int j = 0; j < 20; j++)	TweenManager.service(500);
@@ -263,6 +263,6 @@ public class TestReuse
 				Assert.assertEquals("rec: callback count (2)", 9, rl.cnt);
 		}
 
-    }    
+    }
 }
 
