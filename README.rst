@@ -149,6 +149,3 @@ To build and run the tests
 You can build the .jar library by executing
 ::
  ant dist
-
-You will need ant and ant-junit to do this.
-
