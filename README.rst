@@ -135,13 +135,10 @@ Don't worry, we take care of GC for you by using memory pools internally ;)
 
 Building
 ~~~~~~~~
-Build requirements in addition to the usual Java and Android stuff are ANT & JUnit 4, which can be a bit tricky on some systems:
-::
- # on Ubuntu 14.04 
- sudo apt-get install ant junit
- sudo ln -s  /usr/share/java/junit4.jar /usr/share/ant/lib/unit4.jar
+Build requirements in addition to the usual Java and Android stuff are ant & JUnit 4, 
+which can be a bit tricky to install on some systems (i.e. apt-get wont suffice).
  
-To build and run the tests
+When that is done, to build the code and run the tests
 ::
  ant compile
  ant test
