@@ -1,6 +1,9 @@
 Tweeny
 ======
 
+.. image:: https://drone.io/github.com/tube42/tweeny/status.png
+    :target: https://drone.io/github.com/tube42/tweeny/latest
+
 Tweeny is an extremely simple Java tweening library (http://en.wikipedia.org/wiki/Inbetweening)
 
 Tween  what??

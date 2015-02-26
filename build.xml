@@ -14,15 +14,16 @@
   </target>
   
   <target name="compile" depends="init" >
-    <javac srcdir="${src}" destdir="${build}"/>
+    <javac srcdir="${src}" destdir="${build}" excludes="se/tube42/test/**"/>
   </target>
   
   <target name="dist" depends="compile" >
-    <jar jarfile="Tweeny_lib.jar" basedir="${build}" includes="se/tube42/lib/**" />
+    <jar jarfile="Tweeny_lib.jar" basedir="${build}" includes="se/tube42/lib/tweeny/**" />
   </target>
   
   <!-- unit testing -->
-  <target name="test" depends="compile" >           
+  <target name="test" depends="init">
+    <javac srcdir="${src}" destdir="${build}" />     <!-- compiles all, test included -->
     <junit haltonerror="true" haltonfailure="true" >      
       <classpath path="${build}" />                     
       <formatter type="brief" usefile="false" />      
