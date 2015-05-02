@@ -46,4 +46,35 @@ public class TweenHelper
                 .tail(vend).configure(t, eq);
         }
     }
+    
+    
+    /**
+     * set array members to given value
+     */
+    public static void set(Item [] items, int property, float val)
+    {
+        for(int i = 0; i < items.length; i++)
+            items[i].setImmediate(property, val);
+    }
+    
+    /**
+     * set array members to given range
+     */
+    public static void set(Item [] items, int property, float vmin, float vmax)
+    {
+        for(int i = 0; i < items.length; i++)
+            items[i].setImmediate(property, random(vmin, vmax));
+    }
+    
+    
+   /**
+    * remove array members ongoing tweens
+    */
+    public static void remove(Item [] items, int property, boolean finish)
+    {
+        for(int i = 0; i < items.length; i++)
+            items[i].removeTween(property, finish);
+    }
+     
+    
 }
