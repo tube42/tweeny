@@ -124,6 +124,7 @@ If you want to see some examples, take look at these directories
  src/se/tube42/example/demo3        - demonstrates the different ease equations 
  src/se/tube42/example/demo4        - demonstrates use of finish(Runnable) to detect end of tweening
  src/se/tube42/example/demo5        - demonstrates use of finish(TweenListener) for animation
+ src/se/tube42/example/demo6        - demonstrates use of TweenHelper
  
 
 
@@ -131,6 +132,10 @@ Advanced topics
 ---------------
 If you are a n00b, you can safely ignore this part...
 
+
+Thread safety
+~~~~~~~~~~~~~
+Tweeny is NOT thread safe. Modifying tweens from multiple threads will result in weird crashes :(
 
 Garbage collection
 ~~~~~~~~~~~~~~~~~~

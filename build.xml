@@ -63,6 +63,12 @@
       <classpath path="${build}"/>      
     </java>
   </target>
+
+  <target name="demo6" depends="compile" >
+    <java classname="se.tube42.example.demo6.Main" fork="yes">
+      <classpath path="${build}"/>      
+    </java>
+  </target>
   
   <!-- misc -->
   <target name="doc" depends="compile" >

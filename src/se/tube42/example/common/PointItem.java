@@ -22,6 +22,7 @@ public class PointItem extends Item
 
     // these are not tweened
     public Color c;
+    public int size = SIZE;
 
     public PointItem(Color c, int x, int y)
     {
@@ -35,7 +36,7 @@ public class PointItem extends Item
 
     public void draw(Graphics g)
     {
-        final float size = SIZE * get(ITEM_S);
+        final float s = size * get(ITEM_S);
         final float x = get(ITEM_X);
         final float y = get(ITEM_Y);
 
@@ -43,10 +44,10 @@ public class PointItem extends Item
 
         // g.fillOval((int)x, (int)y, (int)size, (int)size);
         g.fillOval(
-                  (int)(x - size / 2),
-                  (int)(y - size / 2),
-                  (int)size,
-                  (int)size
+                  (int)(x - s / 2),
+                  (int)(y - s / 2),
+                  (int)s,
+                  (int)s
                   );
 
     }
