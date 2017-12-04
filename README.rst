@@ -123,7 +123,6 @@ Build requirements in addition to the usual Java and Android stuff are ant & JUn
 which can be a bit tricky to install on some systems (i.e. apt-get wont suffice).
  
 When that is done, to build the code and run the tests
-
 ::
  ./gradlew build
  ./gradlew test
