@@ -3,22 +3,8 @@ Tweeny
 
 Tweeny is an extremely simple Java tweening library (http://en.wikipedia.org/wiki/Inbetweening)
 
-Tween  what??
--------------
-Assume that we have an object with two variables. This could for example be a sprite with X and Y coordinates.
-If we change these variables, we will see the sprite to move immediately:
+If you don't know why it is useful, I suggest you watch `this video <http://www.youtube.com/watch?v=Fy0aCDmgnxg>`_ 
 
-.. image:: http://tube42.github.io/tweeny/notween.gif
-
-This might be exactly what you want. But the sudden jump from point 1 to point 2 could also be extremly boring...
-Something it is much nicer to the eye to **animate** this movement from current value to goal value during a number of frames
-
-.. image:: http://tube42.github.io/tweeny/tween.gif
-
-And this is exactly what Tweeny does for you...
-
-
-If you are still not convinced about usefulness of this, I suggest you watch `this video <http://www.youtube.com/watch?v=Fy0aCDmgnxg>`_ 
 
 Where to get it?
 ----------------
@@ -26,9 +12,6 @@ Where to get it?
 Source code (under GPL-lib v2):
 :: 
  git clone https://github.com/tube42/tweeny.git
-
-
-Binary: http://tube42.github.io/tweeny/bin/Tweeny_lib.jar 
 
 
 How to use Tweeny:
@@ -115,6 +98,9 @@ From the source tree, do this to build the API docs
  ./gradlew javadoc
 
 If you want to see some examples, take look at the examples folder
+::
+ ./gradlew run
+
 
 Advanced topics
 ---------------
