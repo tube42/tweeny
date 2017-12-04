@@ -1,0 +1,16 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+
+dependencies {
+    compile project(':library')
+}
+
+// Define the main class for the application
+mainClassName = 'se.tube42.example.Main'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'se.tube42.example.Main'
+    }
+}

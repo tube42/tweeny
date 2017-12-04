@@ -1,9 +1,6 @@
 Tweeny
 ======
 
-.. image:: https://drone.io/github.com/tube42/tweeny/status.png
-    :target: https://drone.io/github.com/tube42/tweeny/latest
-
 Tweeny is an extremely simple Java tweening library (http://en.wikipedia.org/wiki/Inbetweening)
 
 Tween  what??
@@ -115,18 +112,9 @@ I need more information!
 ~~~~~~~~~~~~~~~~~~~~~~~~
 From the source tree, do this to build the API docs
 ::
- ant doc
+ ./gradlew javadoc
 
-If you want to see some examples, take look at these directories
-:: 
- src/se/tube42/example/demo1        - demonstrates basics of tweening
- src/se/tube42/example/demo2        - demonstrates use of tail() to creates chains of tweens 
- src/se/tube42/example/demo3        - demonstrates the different ease equations 
- src/se/tube42/example/demo4        - demonstrates use of finish(Runnable) to detect end of tweening
- src/se/tube42/example/demo5        - demonstrates use of finish(TweenListener) for animation
- src/se/tube42/example/demo6        - demonstrates use of TweenHelper
- 
-
+If you want to see some examples, take look at the examples folder
 
 Advanced topics
 ---------------
@@ -136,6 +124,8 @@ If you are a n00b, you can safely ignore this part...
 Thread safety
 ~~~~~~~~~~~~~
 Tweeny is NOT thread safe. Modifying tweens from multiple threads will result in weird crashes :(
+
+In fact, you can crash most examples by 
 
 Garbage collection
 ~~~~~~~~~~~~~~~~~~
@@ -147,10 +137,11 @@ Build requirements in addition to the usual Java and Android stuff are ant & JUn
 which can be a bit tricky to install on some systems (i.e. apt-get wont suffice).
  
 When that is done, to build the code and run the tests
+
 ::
- ant compile
- ant test
+ ./gradlew build
+ ./gradlew test
 
 You can build the .jar library by executing
 ::
- ant dist
+ ./gradlew jar
