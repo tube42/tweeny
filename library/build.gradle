@@ -1,15 +1,69 @@
-apply plugin: 'java-library'
+buildscript {
+  repositories {
+        jcenter()
+   }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
+allprojects {
+	repositories {
+		jcenter()
+	}
+	apply plugin: 'maven'
+	apply plugin: 'maven-publish'
+	apply plugin: 'java'
+    apply plugin: 'java-library'
+}
+
 
 version = '0.3.0'
+group = 'se.tube42.tweeny'
 
-jar {
-    manifest.attributes provider: 'gradle'
+publishing {
+	publications {
+		MyPublication(MavenPublication) {
+			from components.java
+			groupId project.group
+            artifactId 'tweeny'
+            version project.version
+		}
+	}
+}
+
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+	publications = ['MyPublication']
+	pkg {
+		repo = 'maven'
+		name = 'tweeny'
+        desc = 'tween library'
+		userOrg = user
+		licenses = ['LGPL-2.1']
+        websiteUrl = 'https://github.com/tube42/tween'
+        issueTrackerUrl = 'https://github.com/tube42/tweeny/issues'
+		vcsUrl = 'https://github.com/tube42/tweeny.git'
+		labels = ['tween', 'animation', 'game-library']
+        githubRepo = 'tube42/tweeny'
+        githubReleaseNotesFile = 'README.rst'
+        publicDownloadNumbers = true
+		version {
+			name = project.version
+			desc = 'tweeny library ' + project.version
+			vcsTag = project.version
+		}
+	}
 }
 
 
 jar {
     manifest {
-        attributes('Implementation-Title': project.name,
-                   'Implementation-Version': project.version)
+        attributes('Provider': 'gradle',
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version)
     }
 }
