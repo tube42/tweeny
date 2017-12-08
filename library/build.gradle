@@ -16,6 +16,20 @@ allprojects {
 	apply plugin: 'maven-publish'
 	apply plugin: 'java'
     apply plugin: 'java-library'
+
+
+    // custom tasks for creating source/javadoc jars
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+    artifacts {
+        archives sourcesJar, javadocJar
+    }
 }
 
 
@@ -26,9 +40,14 @@ publishing {
 	publications {
 		MyPublication(MavenPublication) {
 			from components.java
+
 			groupId project.group
             artifactId 'tweeny'
             version project.version
+
+            // publish sources and javadocs too
+            artifact sourcesJar
+            artifact javadocJar
 		}
 	}
 }
@@ -44,7 +63,7 @@ bintray {
         desc = 'tween library'
 		userOrg = user
 		licenses = ['LGPL-2.1']
-        websiteUrl = 'https://github.com/tube42/tween'
+        websiteUrl = 'https://github.com/tube42/tweeny'
         issueTrackerUrl = 'https://github.com/tube42/tweeny/issues'
 		vcsUrl = 'https://github.com/tube42/tweeny.git'
 		labels = ['tween', 'animation', 'game-library']
