@@ -38,6 +38,12 @@ Bintray maven repository:
 .. image:: https://api.bintray.com/packages/tube42/maven/tweeny/images/download.svg
     :target: https://bintray.com/tube42/maven/tweeny/_latestVersion
 
+If you are using gradle with jcenter():
+::
+ dependencies {
+    compile "se.tube42.ks:ks:0.3.1"
+ }
+
 
 How to use Tweeny:
 ------------------
@@ -141,17 +147,3 @@ In fact, you can crash most examples by
 Garbage collection
 ~~~~~~~~~~~~~~~~~~
 Don't worry, we take care of GC for you by using memory pools internally ;)
-
-Building
-~~~~~~~~
-Build requirements in addition to the usual Java and Android stuff are ant & JUnit 4,
-which can be a bit tricky to install on some systems (i.e. apt-get wont suffice).
-
-When that is done, to build the code and run the tests
-::
- ./gradlew build
- ./gradlew test
-
-You can build the .jar library by executing
-::
- ./gradlew jar
