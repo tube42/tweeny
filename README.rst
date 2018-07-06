@@ -41,7 +41,7 @@ Bintray maven repository:
 If you are using gradle with jcenter():
 ::
  dependencies {
-    compile "se.tube42.ks:ks:0.3.1"
+    compile "se.tube42.tweeny:tweeny:0.3.1"
  }
 
 
