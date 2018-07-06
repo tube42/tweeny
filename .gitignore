@@ -3,3 +3,8 @@ docs/
 *.jar
 *~
 .gradle
+
+# eclipse, yikes
+.classpath
+.project
+.settings
